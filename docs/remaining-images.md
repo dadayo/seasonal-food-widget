@@ -1,85 +1,36 @@
-# 남은 이미지 (26개) — 수채화
+# 마지막 남은 이미지 (11개) — 수채화
 
-현재 66/92 완료. 아래 3장이면 끝! 규격: 수채화, 배경 투명 PNG, 음식만.
+현재 **81/92 완료**. 아래 한 장이면 끝! 규격: 수채화, 배경 투명 PNG, 음식만, 글자/그림자 없음.
 
-> ⚠️ 생성기가 가끔 같은 걸 두 번 그리고 하나를 빠뜨려요. **"모두 다른 음식, 중복 없음"**을 꼭 지켜달라고 넣었어요.
+> ⚠️ 생성기가 비슷한 조개·생선·나물을 헷갈려서 중복/누락이 잦았어요. **"모두 다른 음식, 중복 없음"**을 꼭 지켜주세요. 특히 조개류(대합 vs 키조개)와 나물(미나리/달래/쪽파)을 구분되게요.
 
-## 시트 A: 누락분 모음 (5개)
+## 마지막 시트 (11개)
 
-| 음식 | 파일명 |
-|---|---|
-| 밤 | `chestnut.png` |
-| 대하 | `prawn.png` |
-| 고구마 | `sweet-potato.png` |
-| 시금치 | `spinach.png` |
-| 대게 | `snow-crab.png` |
+| 음식 | 파일명 | 설명 포인트 |
+|---|---|---|
+| 밤 | `chestnut.png` | 갈색 밤, 하나는 까서 속 보이게 |
+| 대하 | `prawn.png` | 큰 새우 한 마리 |
+| 고구마 | `sweet-potato.png` | 자주색 껍질 고구마 |
+| 시금치 | `spinach.png` | 뿌리 달린 초록 시금치 한 단 |
+| 대게 | `snow-crab.png` | 다리 긴 대게 |
+| 딸기 | `strawberry.png` | 빨간 딸기 (꼭지 초록) |
+| 도미 | `sea-bream.png` | 붉은 도미 (분홍빛 바다생선) |
+| 멍게 | `sea-squirt.png` | 주황색 울퉁불퉁 멍게 |
+| 미나리 | `water-dropwort.png` | 긴 초록 줄기 미나리 한 단 |
+| 달래 | `wild-chive.png` | 작은 흰 알뿌리 달린 달래 |
+| 쪽파 | `scallion.png` | 가는 초록 쪽파 한 단 |
 
 ```
-A set of 5 different Korean seasonal foods, watercolor illustration, soft hand-painted botanical style, arranged in an evenly spaced grid, each item fully separate and not overlapping, ALL items must be DIFFERENT (no duplicates), isolated on a fully transparent background, no text, no labels, no shadows, consistent style, high detail. Items in order:
-1. a small pile of chestnuts with one peeled to show inside
-2. a large prawn (shrimp)
+A set of 11 different Korean seasonal foods, watercolor illustration, soft hand-painted botanical style, arranged in an evenly spaced grid, each item fully separate and clearly DIFFERENT from the others (no duplicates), isolated on a fully transparent background, no text, no labels, no shadows, consistent style, high detail. Items in order:
+1. a small pile of chestnuts, one peeled to show the inside
+2. a single large prawn (shrimp), pinkish-grey
 3. a purple-skinned sweet potato
-4. a bunch of fresh green spinach
+4. a bunch of green spinach with pink roots
 5. a snow crab with long legs (daege)
+6. a bright red strawberry with a green top
+7. a pink-red sea bream fish (domi)
+8. an orange bumpy sea pineapple / sea squirt (meongge)
+9. a tied bundle of long green water dropwort stems (minari)
+10. a small bunch of wild chives with tiny white bulbs (dallae)
+11. a tied bundle of thin green scallions (jjokpa)
 ```
-
-## 시트 B (봄 해산물·나물) (12개)
-
-| 음식 | 파일명 |
-|---|---|
-| 매생이 | `seaweed-fulvescens.png` |
-| 봄동 | `spring-cabbage.png` |
-| 딸기 | `strawberry.png` |
-| 미나리 | `water-dropwort.png` |
-| 달래 | `wild-chive.png` |
-| 두릅 | `aralia-sprout.png` |
-| 대합 | `hard-clam.png` |
-| 금귤 | `kumquat.png` |
-| 키조개 | `pen-shell.png` |
-| 쪽파 | `scallion.png` |
-| 도미 | `sea-bream.png` |
-| 멍게 | `sea-squirt.png` |
-
-```
-A set of 12 different Korean seasonal foods, watercolor illustration, soft hand-painted botanical style, arranged in an evenly spaced grid, each item fully separate and not overlapping, ALL items must be DIFFERENT (no duplicates), isolated on a fully transparent background, no text, no labels, no shadows, consistent style, high detail. Items in order:
-1. a clump of fine green seaweed (maesaengi)
-2. a flat open Korean spring cabbage (bomdong)
-3. a red strawberry with green leaves
-4. a bundle of Korean water dropwort (minari)
-5. a bunch of Korean wild chives (dallae) with tiny bulbs
-6. Korean aralia tree sprouts (durup)
-7. a large hard clam (daehap)
-8. small orange kumquats with leaves
-9. a triangular pen shell (kijogae)
-10. a bunch of small green scallions
-11. a red sea bream fish
-12. an orange bumpy sea pineapple (meongge)
-```
-
-## 시트 C (봄 채소·생선) (9개)
-
-| 음식 | 파일명 |
-|---|---|
-| 주꾸미 | `webfoot-octopus.png` |
-| 취나물 | `chwinamul.png` |
-| 상추 | `lettuce.png` |
-| 마늘쫑 | `garlic-scape.png` |
-| 도다리 | `flounder.png` |
-| 완두콩 | `green-pea.png` |
-| 양파 | `onion.png` |
-| 아스파라거스 | `asparagus.png` |
-| 죽순 | `bamboo-shoot.png` |
-
-```
-A set of 9 different Korean seasonal foods, watercolor illustration, soft hand-painted botanical style, arranged in an evenly spaced grid, each item fully separate and not overlapping, ALL items must be DIFFERENT (no duplicates), isolated on a fully transparent background, no text, no labels, no shadows, consistent style, high detail. Items in order:
-1. a small webfoot octopus (jukkumi)
-2. a bunch of Korean aster greens (chwinamul)
-3. green leaf lettuce
-4. a bundle of green garlic scapes
-5. a flounder fish (dodari)
-6. green peas in open pods
-7. a brown-skinned onion
-8. a bundle of green asparagus spears
-9. a fresh pointed bamboo shoot
-```
-
