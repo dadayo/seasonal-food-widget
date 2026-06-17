@@ -67,3 +67,24 @@ A set of 4 different Korean vegetables, watercolor illustration, clearly differe
 3. a tied bundle of flat green garlic chives (buchu)
 4. a small pile of yellow ginkgo nuts (eunhaeng)
 ```
+
+## 신규 시트 C — 봄나물·뿌리채소 7개
+| 음식 | 파일명 |
+|---|---|
+| 고사리 | `bracken.png` |
+| 곰취 | `gomchwi.png` |
+| 머위 | `butterbur.png` |
+| 유채 | `rape-greens.png` |
+| 시래기 | `dried-radish-greens.png` |
+| 생강 | `ginger.png` |
+| 마 | `yam.png` |
+```
+A set of 7 different Korean vegetables, watercolor illustration, clearly different from each other, isolated on a fully transparent background, no text, no shadow, high detail. Items in order:
+1. curled young bracken fern shoots / fiddleheads, brownish green (gosari)
+2. broad round green Korean aster leaves (gomchwi)
+3. butterbur leaves with thick green stalks (meowi)
+4. green rape leaves with small yellow flowers (yuchae)
+5. a tied bundle of dried brownish radish greens (siraegi)
+6. a knobby beige fresh ginger root (saenggang)
+7. a long pale Korean yam tuber (ma)
+```
