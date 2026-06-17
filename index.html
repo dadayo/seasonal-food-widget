@@ -23,13 +23,22 @@
   .pageturn .page{box-shadow:0 14px 26px #0000002b;}
   .pageturn::after{content:"";position:absolute;inset:0;
     background:linear-gradient(135deg, #0000 30%, #00000033);opacity:0;}
-  .pageturn.go{animation:teardiag .66s cubic-bezier(.36,.02,.3,1) forwards;}
-  .pageturn.go::after{animation:shade .66s ease forwards;}
-  /* diagonal tear: pivots at top-left corner, folds up and tilts away */
+  /* FOOD change: slow diagonal tear-off (pivots top-left, folds up + tilts) */
+  .pageturn.go{animation:teardiag 1.05s cubic-bezier(.33,0,.25,1) forwards;}
+  .pageturn.go::after{animation:shade 1.05s ease forwards;}
   @keyframes teardiag{
     0%{transform:rotateZ(0) rotateX(0)}
     100%{transform:rotateZ(-13deg) rotateX(-118deg);opacity:.1}}
   @keyframes shade{0%{opacity:0}100%{opacity:.55}}
+  /* MONTH change: horizontal slide (whole page swipes aside) */
+  .pageturn.slideL{transform-origin:50% 50%;animation:slideL .62s cubic-bezier(.5,0,.35,1) forwards;}
+  .pageturn.slideR{transform-origin:50% 50%;animation:slideR .62s cubic-bezier(.5,0,.35,1) forwards;}
+  @keyframes slideL{to{transform:translateX(-107%);opacity:.5}}
+  @keyframes slideR{to{transform:translateX(107%);opacity:.5}}
+  .page.inR{animation:inR .62s cubic-bezier(.5,0,.35,1);}
+  .page.inL{animation:inL .62s cubic-bezier(.5,0,.35,1);}
+  @keyframes inR{from{transform:translateX(38%);opacity:.4}to{transform:none;opacity:1}}
+  @keyframes inL{from{transform:translateX(-38%);opacity:.4}to{transform:none;opacity:1}}
 
   /* header = context (de-emphasized) */
   .top{display:flex;justify-content:space-between;align-items:center;flex:none;z-index:2;}

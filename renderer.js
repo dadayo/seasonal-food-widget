@@ -54,9 +54,11 @@
     const pp = document.querySelector('.peek .p[data-i="'+i+'"]'); if (pp) pp.classList.add('on');
   }
 
-  // full-page diagonal tear-off — clone current page, run update underneath, peel overlay away
+  // clone current page as an overlay, run update underneath, then animate overlay away.
+  // mode 'tear'  = diagonal tear-off (food change)
+  // mode 'slide' = horizontal swipe (month change); dir 'next'|'prev'
   let turning = false;
-  function turn(update) {
+  function turn(update, mode, dir) {
     if (turning) { update(); return; }
     turning = true;
     const card = $('card'), page = $('page');
@@ -64,21 +66,30 @@
     ov.appendChild(page.cloneNode(true));
     card.appendChild(ov);
     update();
-    requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('go')));
-    setTimeout(() => { if (ov.parentNode) ov.remove(); turning = false; }, 760);
+    let dur;
+    if (mode === 'slide') {
+      dur = 700;
+      ov.classList.add(dir === 'next' ? 'slideL' : 'slideR');     // old page swipes aside
+      page.classList.add(dir === 'next' ? 'inR' : 'inL');         // new page eases in
+      setTimeout(() => { page.classList.remove('inR','inL'); }, 640);
+    } else {
+      dur = 1120;
+      requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('go')));
+    }
+    setTimeout(() => { if (ov.parentNode) ov.remove(); turning = false; }, dur);
   }
-  function flipTo(i){ turn(() => { cur = (i + pool.length) % pool.length; paint(cur); }); }
+  function flipTo(i){ turn(() => { cur = (i + pool.length) % pool.length; paint(cur); }, 'tear'); }
   function goto(i){ flipTo(i); restart(); }
   function next(){ flipTo(cur + 1); }
 
-  function setMonth(m) {
+  function setMonth(m, dir) {
     turn(() => {
       viewMonth = ((m - 1 + 12) % 12) + 1;
       manual = (viewMonth !== cm());
       build(viewMonth);
       cur = manual ? 0 : (new Date().getDate() % pool.length);
       paint(cur);
-    });
+    }, 'slide', dir || 'next');
     restart();
   }
 
@@ -94,8 +105,8 @@
   // interactions
   $('imgwrap').onclick = () => goto(cur + 1);
   $('recipe').onclick = () => window.api && window.api.openRecipe(pool[cur].name);
-  $('prev').onclick = () => setMonth(viewMonth - 1);
-  $('next').onclick = () => setMonth(viewMonth + 1);
+  $('prev').onclick = () => setMonth(viewMonth - 1, 'prev');
+  $('next').onclick = () => setMonth(viewMonth + 1, 'next');
   const card = $('card');
   card.addEventListener('mouseenter', stop);
   card.addEventListener('mouseleave', start);
