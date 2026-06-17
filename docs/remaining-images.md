@@ -1,11 +1,5 @@
-# 남은 이미지 — 단 1개! 🎉
+# 이미지 완성 🎉
 
-현재 **91/92 완료**. 마지막 하나만 만들면 끝입니다.
+**92 / 92 — 모든 제철 음식 이미지 적용 완료!**
 
-| 음식 | 파일명 |
-|---|---|
-| 고구마 | `sweet-potato.png` |
-
-```
-A single purple-skinned sweet potato, watercolor illustration, soft hand-painted botanical style, isolated on a fully transparent background, no text, no shadow, PNG with alpha, high detail
-```
+남은 이미지 없음. (참고: 민어 `croaker.png`는 초기 버전 이미지가 그대로예요. 더 또렷하게 바꾸고 싶으면 `docs/regenerate.md`의 흰살생선 프롬프트 참고.)
