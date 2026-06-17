@@ -52,12 +52,12 @@
     cur = (i + pool.length) % pool.length;
     const el = $('flip');
     el.classList.remove('go'); void el.offsetWidth; el.classList.add('go');
-    setTimeout(() => paint(cur), 250);
+    setTimeout(() => paint(cur), 450);
   }
   function goto(i){ flipTo(i); restart(); }
   function next(){ flipTo(cur + 1); }
 
-  function start(){ timer = setInterval(next, 6000); }
+  function start(){ timer = setInterval(next, 9000); }
   function stop(){ clearInterval(timer); timer = null; }
   function restart(){ stop(); start(); }
 

@@ -64,7 +64,7 @@ function buildTray() {
     { label: '종료', click: () => app.quit() },
   ]);
   tray.setContextMenu(menu);
-  tray.setTitle('🍎');
+  tray.setTitle(' 제철');
 }
 
 app.whenReady().then(() => {
