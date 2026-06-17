@@ -5,92 +5,63 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>제철 음식</title>
 <style>
+  @font-face{
+    font-family:"Pretendard";
+    src:url("fonts/PretendardVariable.woff2") format("woff2-variations");
+    font-weight:100 900;font-display:swap;
+  }
   :root{
-    --paper:#F3ECDC; --paper2:#EFE6D2;
-    --green:#1E9E57; --green-soft:#cfe7d6;
-    --coral:#FF5C84; --coral-soft:#ffd6e0;
-    --ink:#2c2a26;
+    --paper:#FBFAF7; --line:#00000012;
+    --green:#1E9E57; --coral:#FF5C84; --ink:#26241F; --muted:#9c968b;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;}
   html,body{background:transparent;overflow:hidden;
-    font-family:-apple-system,"Apple SD Gothic Neo","Helvetica Neue",sans-serif;}
+    font-family:"Pretendard",-apple-system,"Apple SD Gothic Neo",sans-serif;}
   #card{
-    margin:10px;height:calc(100vh - 20px);border-radius:8px;
+    margin:8px;height:calc(100vh - 16px);border-radius:16px;
     background:var(--paper);overflow:hidden;position:relative;
-    -webkit-app-region:drag;box-shadow:0 14px 36px #0003, inset 0 0 0 1px #00000010;
-    color:var(--ink);padding:20px 22px 16px;
-    display:flex;flex-direction:column;
+    -webkit-app-region:drag;box-shadow:0 8px 24px #0000001f, inset 0 0 0 1px var(--line);
+    color:var(--ink);padding:13px 15px;display:flex;flex-direction:column;
   }
-  /* riso paper grain */
-  #card::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
-    mix-blend-mode:multiply;}
-  /* top decorative riso mark (like the calendar whisker) */
-  .mark{position:relative;height:18px;margin-bottom:2px;}
-  .mark::before,.mark::after{content:"";position:absolute;top:8px;left:0;width:46px;height:3px;
-    background:var(--coral);border-radius:3px;transform-origin:left center;}
-  .mark::before{transform:rotate(18deg);}
-  .mark::after{transform:rotate(-18deg);}
-  .mark i{position:absolute;left:42px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--coral);}
+  .top{display:flex;justify-content:space-between;align-items:baseline;}
+  .mon{font-size:14px;font-weight:800;color:var(--green);letter-spacing:-.3px;}
+  .season{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
 
-  .kick{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--coral);
-    text-transform:uppercase;}
-  .month{font-size:40px;font-weight:900;line-height:.98;color:var(--green);
-    letter-spacing:-1px;margin-top:1px;}
-  .monthen{font-size:12px;font-weight:700;letter-spacing:1px;color:var(--ink);opacity:.55;
-    text-transform:uppercase;margin-top:3px;}
+  .body{flex:1;display:flex;align-items:center;gap:13px;margin:2px 0;}
+  .imgwrap{width:74px;height:74px;flex:none;display:flex;align-items:center;justify-content:center;}
+  .fimg{max-width:74px;max-height:74px;object-fit:contain;
+    filter:drop-shadow(0 3px 5px #00000020);animation:fade .5s ease;}
+  .emoji{font-size:52px;line-height:1;animation:fade .5s ease;}
+  .info{min-width:0;}
+  .cat{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.5px;
+    color:var(--coral);}
+  .fname{font-size:25px;font-weight:800;letter-spacing:-.6px;line-height:1.05;margin-top:1px;}
 
-  /* hero stage with giant faded number watermark */
-  .stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;margin:6px 0 2px;}
-  .bignum{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-size:230px;font-weight:900;color:var(--green);opacity:.10;line-height:1;
-    letter-spacing:-10px;z-index:0;}
-  .hero{position:relative;z-index:1;text-align:center;}
-  .hero .fimg{width:150px;height:150px;object-fit:contain;display:block;margin:0 auto;
-    filter:drop-shadow(0 6px 10px #00000022);animation:pop .45s cubic-bezier(.2,1.5,.4,1);}
-  .hero .emoji{font-size:96px;line-height:1;display:block;animation:pop .45s cubic-bezier(.2,1.5,.4,1);}
-
-  .label{text-align:center;z-index:1;}
-  .cat{display:inline-block;font-size:11px;font-weight:800;letter-spacing:1px;
-    color:#fff;background:var(--coral);padding:3px 10px;border-radius:20px;text-transform:uppercase;}
-  .fname{font-size:30px;font-weight:900;color:var(--ink);margin-top:7px;letter-spacing:-.5px;}
-
-  /* bottom: tiny month roster as dotted ticker */
-  .roster{margin-top:12px;display:flex;flex-wrap:wrap;gap:4px 8px;justify-content:center;}
-  .ritem{font-size:11px;font-weight:600;color:var(--ink);opacity:.45;}
-  .ritem.hot{opacity:1;color:var(--green);font-weight:800;}
-
-  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:13px;
-    border-top:1.5px solid #0000001a;padding-top:7px;}
-  .brand{font-size:12px;font-weight:900;color:var(--green);letter-spacing:1px;}
-  .footnote{font-size:9px;font-weight:600;color:var(--ink);opacity:.5;letter-spacing:.3px;}
-  @keyframes pop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+  .foot{display:flex;justify-content:space-between;align-items:center;
+    font-size:10px;font-weight:600;color:var(--muted);}
+  .foot .cnt b{color:var(--ink);font-weight:800;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
   <div id="card">
-    <div class="mark"><i></i></div>
-    <div class="kick" id="kick">SEASONAL</div>
-    <div class="month" id="month">6월</div>
-    <div class="monthen" id="monthen">JUNE</div>
-
-    <div class="stage">
-      <div class="bignum" id="bignum">6</div>
-      <div class="hero">
+    <div class="top">
+      <span class="mon" id="mon">6월 제철</span>
+      <span class="season" id="season">SUMMER</span>
+    </div>
+    <div class="body">
+      <div class="imgwrap">
         <img class="fimg" id="fimg" alt="" style="display:none">
         <span class="emoji" id="femoji">🍽️</span>
       </div>
+      <div class="info">
+        <span class="cat" id="fcat">제철</span>
+        <div class="fname" id="fname">—</div>
+      </div>
     </div>
-    <div class="label">
-      <span class="cat" id="fcat">제철</span>
-      <div class="fname" id="fname">—</div>
-    </div>
-
-    <div class="roster" id="roster"></div>
-
     <div class="foot">
-      <span class="brand">제철365</span>
-      <span class="footnote" id="footnote">한국 제철 음식 · SEASONAL KOREA</span>
+      <span id="today">오늘의 제철</span>
+      <span class="cnt" id="cnt"></span>
     </div>
   </div>
   <script src="data.js"></script>
