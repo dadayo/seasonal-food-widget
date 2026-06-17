@@ -22,7 +22,16 @@
       shuffle(data[cat]).forEach(([name,emoji]) => {
         const c = document.createElement('span');
         c.className = 'chip'; c.dataset.key = cat+':'+name;
-        c.textContent = emoji + ' ' + name;
+        const slug = (window.SLUG || {})[name];
+        if (slug) {
+          const im = document.createElement('img');
+          im.onerror = () => { im.remove(); c.prepend(document.createTextNode(emoji + ' ')); };
+          im.src = 'assets/' + slug + '.png';
+          c.appendChild(im);
+          c.appendChild(document.createTextNode(name));
+        } else {
+          c.textContent = emoji + ' ' + name;
+        }
         box.appendChild(c);
       });
     }
@@ -40,8 +49,16 @@
     const [cat,name,emoji] = pool[idx % pool.length];
     idx++;
     $('fcat').textContent = CAT_LABEL[cat];
-    const em = $('femoji'); em.textContent = emoji;
-    em.style.animation = 'none'; void em.offsetWidth; em.style.animation = '';
+    const em = $('femoji'), fimg = $('fimg');
+    const slug = (window.SLUG || {})[name];
+    const showEmoji = () => { fimg.style.display='none'; em.style.display='block';
+      em.textContent = emoji; em.style.animation='none'; void em.offsetWidth; em.style.animation=''; };
+    if (slug) {
+      fimg.onload = () => { em.style.display='none'; fimg.style.display='block';
+        fimg.style.animation='none'; void fimg.offsetWidth; fimg.style.animation=''; };
+      fimg.onerror = showEmoji;
+      fimg.src = 'assets/' + slug + '.png';
+    } else { showEmoji(); }
     $('fname').textContent = name;
     // highlight the matching chip
     document.querySelectorAll('.chip.hot').forEach(c => c.classList.remove('hot'));
