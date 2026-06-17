@@ -5,67 +5,107 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>제철 음식</title>
 <style>
-  @font-face{
-    font-family:"Pretendard";
-    src:url("fonts/PretendardVariable.woff2") format("woff2-variations");
-    font-weight:100 900;font-display:swap;
-  }
-  :root{
-    --paper:#FBFAF7; --line:#00000012;
-    --green:#1E9E57; --coral:#FF5C84; --ink:#26241F; --muted:#9c968b;
-  }
+  @font-face{font-family:"Pretendard";src:url("fonts/PretendardVariable.woff2") format("woff2-variations");font-weight:100 900;font-display:swap;}
+  :root{--paper:#FBFAF7;--line:#00000012;--green:#1E9E57;--coral:#FF5C84;--ink:#26241F;--muted:#9c968b;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;}
-  html,body{background:transparent;overflow:hidden;
-    font-family:"Pretendard",-apple-system,"Apple SD Gothic Neo",sans-serif;}
-  #card{
-    margin:8px;height:calc(100vh - 16px);border-radius:16px;
-    background:var(--paper);overflow:hidden;position:relative;
-    -webkit-app-region:drag;box-shadow:0 8px 24px #0000001f, inset 0 0 0 1px var(--line);
-    color:var(--ink);padding:13px 15px;display:flex;flex-direction:column;
-  }
-  .top{display:flex;justify-content:space-between;align-items:baseline;}
-  .mon{font-size:14px;font-weight:800;color:var(--green);letter-spacing:-.3px;}
-  .season{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+  html,body{background:transparent;overflow:hidden;font-family:"Pretendard",-apple-system,sans-serif;}
+  #card{margin:8px;height:calc(100vh - 16px);border-radius:16px;background:var(--paper);
+    overflow:hidden;position:relative;-webkit-app-region:drag;
+    box-shadow:0 8px 24px #0000001f, inset 0 0 0 1px var(--line);
+    color:var(--ink);padding:13px 15px;display:flex;flex-direction:column;perspective:900px;}
 
-  .body{flex:1;display:flex;align-items:center;gap:13px;margin:2px 0;}
-  .imgwrap{width:74px;height:74px;flex:none;display:flex;align-items:center;justify-content:center;}
-  .fimg{max-width:74px;max-height:74px;object-fit:contain;
-    filter:drop-shadow(0 3px 5px #00000020);animation:fade .5s ease;}
-  .emoji{font-size:52px;line-height:1;animation:fade .5s ease;}
-  .info{min-width:0;}
-  .cat{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.5px;
-    color:var(--coral);}
-  .fname{font-size:25px;font-weight:800;letter-spacing:-.6px;line-height:1.05;margin-top:1px;}
+  .top{display:flex;justify-content:space-between;align-items:baseline;flex:none;z-index:2;}
+  .mon{font-weight:800;color:var(--green);letter-spacing:-.3px;font-size:14px;}
+  .season{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:1px;}
 
-  .foot{display:flex;justify-content:space-between;align-items:center;
+  .stage{flex:1;position:relative;display:flex;align-items:center;}
+  .bignum{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+    font-size:200px;font-weight:900;color:var(--green);opacity:.08;z-index:0;letter-spacing:-8px;}
+  .flip{position:relative;z-index:1;width:100%;transform-origin:50% 0;backface-visibility:hidden;}
+  .flip.go{animation:pageflip .52s cubic-bezier(.4,0,.3,1);}
+  @keyframes pageflip{0%{transform:rotateX(0)}48%{transform:rotateX(-85deg)}
+    52%{transform:rotateX(85deg)}100%{transform:rotateX(0)}}
+
+  .body{display:flex;align-items:center;gap:13px;}
+  .imgwrap{flex:none;display:flex;align-items:center;justify-content:center;-webkit-app-region:no-drag;cursor:pointer;}
+  .fimg{object-fit:contain;filter:drop-shadow(0 3px 5px #00000020);}
+  .emoji{line-height:1;}
+  .info{min-width:0;flex:1;}
+  .cat{font-size:10px;font-weight:800;letter-spacing:.5px;color:var(--coral);}
+  .fname{font-weight:800;letter-spacing:-.6px;line-height:1.05;margin-top:1px;}
+  .recipe{margin-top:6px;font-size:11px;color:var(--muted);font-weight:600;
+    -webkit-app-region:no-drag;cursor:pointer;line-height:1.35;}
+  .recipe b{color:var(--ink);font-weight:700;}
+  .recipe .go-r{color:var(--green);font-weight:800;}
+
+  .peek{display:none;flex-wrap:wrap;gap:6px;margin-top:9px;flex:none;}
+  .peek .p{width:30px;height:30px;border-radius:8px;background:#00000006;display:flex;
+    align-items:center;justify-content:center;-webkit-app-region:no-drag;cursor:pointer;
+    box-shadow:inset 0 0 0 1px #00000010;transition:transform .12s;}
+  .peek .p:hover{transform:translateY(-2px);}
+  .peek .p img{max-width:22px;max-height:22px;object-fit:contain;}
+  .peek .p span{font-size:15px;}
+  .peek .p.on{background:var(--coral);box-shadow:none;}
+
+  .foot{display:flex;justify-content:space-between;align-items:center;flex:none;margin-top:9px;
     font-size:10px;font-weight:600;color:var(--muted);}
   .foot .cnt b{color:var(--ink);font-weight:800;}
-  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  /* ---- size: small ---- */
+  [data-size="s"] .fimg{max-width:62px;max-height:62px;}
+  [data-size="s"] .emoji{font-size:46px;}
+  [data-size="s"] .imgwrap{width:62px;height:62px;}
+  [data-size="s"] .fname{font-size:23px;}
+  [data-size="s"] .recipe{display:none;position:absolute;left:13px;right:13px;bottom:30px;
+    background:#fffffff2;padding:6px 9px;border-radius:9px;box-shadow:0 4px 12px #0002;z-index:5;}
+  [data-size="s"] #card:hover .recipe{display:block;}
+
+  /* ---- size: medium ---- */
+  [data-size="m"] .fimg{max-width:86px;max-height:86px;}
+  [data-size="m"] .emoji{font-size:60px;}
+  [data-size="m"] .imgwrap{width:86px;height:86px;}
+  [data-size="m"] .mon{font-size:15px;}
+  [data-size="m"] .fname{font-size:27px;}
+  [data-size="m"] .peek{display:flex;}
+
+  /* ---- size: large ---- */
+  [data-size="l"] .bignum{display:flex;}
+  [data-size="l"] .mon{font-size:17px;}
+  [data-size="l"] .body{flex-direction:column;text-align:center;gap:6px;}
+  [data-size="l"] .info{text-align:center;}
+  [data-size="l"] .fimg{max-width:138px;max-height:138px;}
+  [data-size="l"] .emoji{font-size:104px;}
+  [data-size="l"] .imgwrap{width:138px;height:138px;}
+  [data-size="l"] .fname{font-size:34px;}
+  [data-size="l"] .recipe{font-size:12px;margin-top:8px;}
+  [data-size="l"] .peek{display:flex;justify-content:center;}
 </style>
 </head>
 <body>
-  <div id="card">
-    <div class="top">
-      <span class="mon" id="mon">6월 제철</span>
-      <span class="season" id="season">SUMMER</span>
-    </div>
-    <div class="body">
-      <div class="imgwrap">
-        <img class="fimg" id="fimg" alt="" style="display:none">
-        <span class="emoji" id="femoji">🍽️</span>
+  <div id="card" data-size="m">
+    <div class="top"><span class="mon" id="mon">6월 제철</span><span class="season" id="season">SUMMER</span></div>
+    <div class="stage">
+      <div class="bignum" id="bignum">6</div>
+      <div class="flip" id="flip">
+        <div class="body">
+          <div class="imgwrap" id="imgwrap">
+            <img class="fimg" id="fimg" alt="" style="display:none">
+            <span class="emoji" id="femoji">🍽️</span>
+          </div>
+          <div class="info">
+            <span class="cat" id="fcat">제철</span>
+            <div class="fname" id="fname">—</div>
+            <div class="recipe" id="recipe"></div>
+          </div>
+        </div>
       </div>
-      <div class="info">
-        <span class="cat" id="fcat">제철</span>
-        <div class="fname" id="fname">—</div>
-      </div>
     </div>
-    <div class="foot">
-      <span id="today">오늘의 제철</span>
-      <span class="cnt" id="cnt"></span>
-    </div>
+    <div class="peek" id="peek"></div>
+    <div class="foot"><span id="today">오늘의 제철</span><span class="cnt" id="cnt"></span></div>
   </div>
   <script src="data.js"></script>
   <script src="slugs.js"></script>
+  <script src="recipes.js"></script>
   <script src="renderer.js"></script>
 </body>
 </html>
