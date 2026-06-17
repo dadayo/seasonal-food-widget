@@ -2,7 +2,7 @@ const { app, BrowserWindow, Tray, Menu, nativeImage, screen, ipcMain, shell } = 
 const path = require('path');
 const fs = require('fs');
 
-const SIZES = { s: [276, 188], m: [328, 278], l: [370, 468] };
+const SIZES = { s: [320, 232], m: [372, 322], l: [414, 512] };
 let win, tray, prefsPath, size = 'm';
 
 function loadPrefs() {
