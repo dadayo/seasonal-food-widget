@@ -49,10 +49,16 @@
   }
 
   function flipTo(i) {
+    const card = $('card'), page = $('page');
+    // snapshot the whole current page as a sheet that peels away from the top
+    const ov = document.createElement('div'); ov.className = 'pageturn';
+    ov.appendChild(page.cloneNode(true));
+    card.appendChild(ov);
+    // reveal the next item underneath immediately
     cur = (i + pool.length) % pool.length;
-    const el = $('flip');
-    el.classList.remove('go'); void el.offsetWidth; el.classList.add('go');
-    setTimeout(() => paint(cur), 450);
+    paint(cur);
+    requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('go')));
+    setTimeout(() => { if (ov.parentNode) ov.remove(); }, 720);
   }
   function goto(i){ flipTo(i); restart(); }
   function next(){ flipTo(cur + 1); }
