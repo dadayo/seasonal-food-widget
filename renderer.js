@@ -93,9 +93,10 @@
     restart();
   }
 
-  function start(){ timer = setInterval(next, 9000); }
-  function stop(){ clearInterval(timer); timer = null; }
-  function restart(){ stop(); start(); }
+  let hover = false;
+  function stop(){ if (timer) { clearInterval(timer); timer = null; } }
+  function arm(){ stop(); if (!hover) timer = setInterval(next, 9000); } // idempotent + hover-aware
+  function restart(){ arm(); }
 
   function tick() {
     const k = new Date().toDateString();
@@ -108,8 +109,8 @@
   $('prev').onclick = () => setMonth(viewMonth - 1, 'prev');
   $('next').onclick = () => setMonth(viewMonth + 1, 'next');
   const card = $('card');
-  card.addEventListener('mouseenter', stop);
-  card.addEventListener('mouseleave', start);
+  card.addEventListener('mouseenter', () => { hover = true; stop(); });
+  card.addEventListener('mouseleave', () => { hover = false; arm(); });
 
   if (window.api) {
     window.api.getSize().then(s => { if (s) card.dataset.size = s; }).catch(()=>{});
@@ -121,6 +122,6 @@
   build(viewMonth);
   cur = new Date().getDate() % pool.length;
   paint(cur);
-  start();
+  arm();
   setInterval(tick, 60*1000);
 })();
