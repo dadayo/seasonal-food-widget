@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제철 음식</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; }
+  html,body { background:transparent; overflow:hidden;
+    font-family:-apple-system,"Apple SD Gothic Neo","Pretendard",sans-serif; }
+  #card {
+    margin:10px; height:calc(100vh - 20px); border-radius:22px;
+    background:linear-gradient(160deg,#fff7 ,#fff9 40%,#ffeede 100%);
+    backdrop-filter:blur(18px) saturate(1.4);
+    -webkit-app-region:drag; box-shadow:0 12px 40px #0002, inset 0 0 0 1px #fff8;
+    padding:18px 18px 14px; color:#3a2e26; position:relative; overflow:hidden;
+  }
+  .season-tag { font-size:11px; font-weight:700; letter-spacing:.5px; color:#c47a3a;
+    text-transform:uppercase; opacity:.85; }
+  .month { font-size:26px; font-weight:800; margin-top:2px; line-height:1.1; }
+  .month small { font-size:13px; font-weight:600; color:#9a8576; margin-left:6px; }
+  .feature { margin:14px 0 4px; border-radius:18px; padding:14px;
+    background:#fffdfb; box-shadow:0 6px 18px #d9a86a22, inset 0 0 0 1px #00000008;
+    text-align:center; transition:transform .35s ease; }
+  .feature .cat { font-size:11px; font-weight:700; color:#b98a52; }
+  .feature .emoji { font-size:54px; line-height:1; margin:6px 0; display:block;
+    animation:pop .5s cubic-bezier(.2,1.6,.4,1); }
+  .feature .name { font-size:22px; font-weight:800; }
+  @keyframes pop { 0%{transform:scale(.4);opacity:0} 100%{transform:scale(1);opacity:1} }
+  .lists { margin-top:12px; display:flex; flex-direction:column; gap:9px; }
+  .group { }
+  .group h3 { font-size:11px; font-weight:800; color:#8a7565; margin-bottom:5px;
+    display:flex; align-items:center; gap:5px; }
+  .chips { display:flex; flex-wrap:wrap; gap:5px; }
+  .chip { font-size:12px; font-weight:600; padding:4px 9px; border-radius:11px;
+    background:#ffffffcc; box-shadow:inset 0 0 0 1px #00000010; white-space:nowrap; }
+  .chip.hot { background:#ffe2c2; box-shadow:inset 0 0 0 1px #e8a85e55; }
+  .foot { position:absolute; bottom:9px; right:14px; font-size:10px; color:#b3a597; }
+</style>
+</head>
+<body>
+  <div id="card">
+    <div class="season-tag" id="season">SEASONAL</div>
+    <div class="month" id="month">— <small id="sub"></small></div>
+    <div class="feature" id="feature">
+      <span class="cat" id="fcat"></span>
+      <span class="emoji" id="femoji">🍽️</span>
+      <span class="name" id="fname"></span>
+    </div>
+    <div class="lists">
+      <div class="group"><h3>🥬 농산물</h3><div class="chips" id="produce"></div></div>
+      <div class="group"><h3>🐟 해산물</h3><div class="chips" id="seafood"></div></div>
+      <div class="group"><h3>🍓 과일</h3><div class="chips" id="fruit"></div></div>
+    </div>
+    <div class="foot" id="foot"></div>
+  </div>
+  <script src="data.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

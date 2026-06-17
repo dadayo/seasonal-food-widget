@@ -1,0 +1,13 @@
+{
+  "name": "seasonal-food-widget",
+  "version": "1.0.0",
+  "description": "Korean seasonal food desktop widget",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^42.4.1"
+  }
+}
