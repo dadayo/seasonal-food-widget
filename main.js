@@ -5,7 +5,7 @@ let win, tray;
 
 function createWindow() {
   const { workArea } = screen.getPrimaryDisplay();
-  const W = 320, H = 540;
+  const W = 320, H = 568;
   win = new BrowserWindow({
     width: W, height: H,
     x: workArea.x + workArea.width - W - 24,
