@@ -17,7 +17,9 @@ function savePrefs() { try { fs.writeFileSync(prefsPath, JSON.stringify({ size }
 function place() {
   const { workArea } = screen.getPrimaryDisplay();
   const [w, h] = SIZES[size];
+  win.setResizable(true);           // non-resizable windows ignore setContentSize on macOS
   win.setContentSize(w, h);
+  win.setResizable(false);
   win.setPosition(workArea.x + workArea.width - w - 24, workArea.y + 24);
 }
 function createWindow() {
