@@ -13,12 +13,21 @@
   const rnd = (a,b) => a + Math.random()*(b-a);
   const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 
-  // eaten checklist (persisted): { "6": {"오이":1, ...} }  keyed by month
+  const STAMPS = ['맛봄','냠','최고','또먹기','굿','쩝쩝','업'];
+  const EMOJIS = ['😋','🤤','😍','🥰','✨','👍','💛','🍴','😆'];
+  // eaten log (persisted): { "6": { "오이": {d:"6.18", s:"냠"} } } keyed by month
   let store = {};
   try { store = JSON.parse(localStorage.getItem('seasonal-eaten') || '{}'); } catch (e) { store = {}; }
   const saveStore = () => { try { localStorage.setItem('seasonal-eaten', JSON.stringify(store)); } catch (e) {} };
-  const isEaten = (m,n) => !!(store[m] && store[m][n]);
-  function toggleEaten(m,n){ store[m] = store[m] || {}; if (store[m][n]) delete store[m][n]; else store[m][n] = 1; saveStore(); }
+  const recOf = (m,n) => store[m] && store[m][n];
+  const isEaten = (m,n) => !!recOf(m,n);
+  function markEat(m,n){            // toggle; returns record if now eaten, else null
+    store[m] = store[m] || {};
+    if (store[m][n]) { delete store[m][n]; saveStore(); return null; }
+    const dt = new Date();
+    const rec = { d: (dt.getMonth()+1) + '.' + dt.getDate(), s: STAMPS[Math.floor(Math.random()*STAMPS.length)] };
+    store[m][n] = rec; saveStore(); return rec;
+  }
 
   let pool = [], viewMonth = cm(), manual = false, dayKey = '';
   let parts = [], stageW = 0, stageH = 0, fx0 = 0, fx1 = 0, fy0 = 0, fy1 = 0;
@@ -38,37 +47,39 @@
   function showName(it) {
     shownIt = it;
     $('namebig').textContent = it.name; $('namebig').classList.add('active');
-    const r = RECIPES[it.name];
-    $('namerec').innerHTML = r ? (r.join(' · ') + ' <span class="go-r">레시피 →</span>') : '<span class="go-r">레시피 검색 →</span>';
-    const eb = $('eatbtn'), eaten = isEaten(viewMonth, it.name);
-    eb.style.display = 'inline-block'; eb.textContent = eaten ? '✓ 먹음' : '○ 먹었어요'; eb.classList.toggle('on', eaten);
+    const r = RECIPES[it.name], rec = recOf(viewMonth, it.name);
+    let html = r ? (r.join(' · ') + ' <span class="go-r">레시피 →</span>') : '<span class="go-r">레시피 검색 →</span>';
+    if (rec && rec.d) html = '<span class="eaten-d">' + rec.d + ' 먹음</span> · ' + html;
+    $('namerec').innerHTML = html;
   }
   function revertName() {
     if (selected) { showName(selected.it); return; }
     shownIt = null;
-    $('namebig').textContent = ''; $('namebig').classList.remove('active');
-    $('namerec').textContent = ''; $('eatbtn').style.display = 'none';
+    $('namebig').textContent = ''; $('namebig').classList.remove('active'); $('namerec').textContent = '';
   }
   function deselect(){ selected = null; parts.forEach(p => p.el.classList.remove('sel')); revertName(); }
   function select(p){ selected = p; parts.forEach(q => q.el.classList.toggle('sel', q === p)); showName(p.it); }
 
-  function popEmoji(p) {
-    const e = document.createElement('span'); e.className = 'pop-emoji'; e.textContent = '😋';
-    e.style.left = p.x + 'px'; e.style.top = (p.y - p.size*0.35) + 'px';
-    $('collage').appendChild(e); setTimeout(() => e.remove(), 950);
+  function burst(p) {
+    const box = $('collage'), k = 5 + Math.floor(Math.random()*4);
+    for (let i = 0; i < k; i++) {
+      const e = document.createElement('span'); e.className = 'pop-emoji';
+      e.textContent = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+      e.style.left = p.x + 'px'; e.style.top = (p.y - p.size*0.2) + 'px';
+      const ang = rnd(-Math.PI*0.92, -Math.PI*0.08), dist = 28 + Math.random()*46;
+      e.style.setProperty('--dx', (Math.cos(ang)*dist).toFixed(0) + 'px');
+      e.style.setProperty('--dy', (Math.sin(ang)*dist - 18).toFixed(0) + 'px');
+      e.style.animationDelay = (Math.random()*0.1).toFixed(2) + 's';
+      box.appendChild(e); setTimeout(() => e.remove(), 1100);
+    }
   }
-  $('eatbtn').onclick = () => {
-    if (!shownIt) return;
-    toggleEaten(viewMonth, shownIt.name);
-    const eaten = isEaten(viewMonth, shownIt.name);
-    parts.forEach(p => {
-      if (p.it.name === shownIt.name) {
-        p.eaten = eaten; p.el.classList.toggle('eaten', eaten);
-        if (eaten) { p.el.classList.add('pop'); setTimeout(() => p.el.classList.remove('pop'), 460); popEmoji(p); }
-      }
-    });
-    showName(shownIt); updateProg();
-  };
+  // click a food (tap, not drag) = toggle eaten
+  function eatToggle(p) {
+    const rec = markEat(viewMonth, p.it.name);
+    p.eaten = !!rec; p.el.classList.toggle('eaten', p.eaten);
+    if (rec) { p.stamp.textContent = rec.s; p.el.classList.add('pop'); setTimeout(() => p.el.classList.remove('pop'), 460); burst(p); }
+    select(p); updateProg();
+  }
   $('namerec').onclick = () => { if (shownIt && window.api) window.api.openRecipe(shownIt.name); };
 
   function stageRect(){ return $('collage').getBoundingClientRect(); }
@@ -87,7 +98,7 @@
     });
     w.addEventListener('pointerenter', () => { const p = parts.find(q => q.el === w); if (p) showName(p.it); });
     w.addEventListener('pointerleave', () => revertName());
-    return { w, im };
+    return { w, im, st };
   }
 
   document.addEventListener('pointermove', (e) => {
@@ -102,7 +113,7 @@
   document.addEventListener('pointerup', () => {
     if (!drag) return;
     const p = drag.p; p.grabbed = false; p.el.style.cursor = '';
-    if (!drag.moved) select(p);
+    if (!drag.moved) eatToggle(p);
     else { p.vx = clamp(drag.vx, -MAXV, MAXV); p.vy = clamp(drag.vy, -MAXV, MAXV); }
     drag = null;
   });
@@ -127,9 +138,11 @@
     drag = null;
     parts = chosen.map((it) => {
       const mk = makePim(it, size); box.appendChild(mk.w);
-      const eaten = isEaten(m, it.name); if (eaten) mk.w.classList.add('eaten');
+      const rec = recOf(m, it.name), eaten = !!rec;
+      if (eaten) mk.w.classList.add('eaten');
+      mk.st.textContent = (rec && rec.s) || '맛봄';
       const r = size * 0.44, ang = rnd(0, Math.PI*2), sp = rnd(0.12, 0.26);
-      return { el:mk.w, img:mk.im, size, it, r, eaten, x: rnd(fx0+r, fx1-r), y: rnd(fy0+r, fy1-r),
+      return { el:mk.w, img:mk.im, stamp:mk.st, size, it, r, eaten, x: rnd(fx0+r, fx1-r), y: rnd(fy0+r, fy1-r),
         vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, rot: rnd(-6,6), vr: rnd(-0.07,0.07), grabbed:false };
     });
     render();
