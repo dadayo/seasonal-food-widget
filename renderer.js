@@ -19,11 +19,11 @@
 
   function header(m) {
     $('card').style.setProperty('--accent', COLOR[m-1]);
-    $('mon').textContent = m + '월 · ' + EN[m-1];
+    $('mon').innerHTML = m + '월 제철 재료<small>' + EN[m-1] + ' · SEASONAL</small>';
     $('cnt').innerHTML = '제철 <b>' + pool.length + '</b>종';
     const d = new Date();
-    if (m === cm()) { $('datebig').textContent = d.getDate(); $('dunit').textContent = '일'; $('weekday').textContent = WEEK[d.getDay()] + '요일'; }
-    else { $('datebig').textContent = m; $('dunit').textContent = '월'; $('weekday').textContent = '제철 미리보기'; }
+    if (m === cm()) { $('datebig').textContent = d.getDate(); $('dunit').textContent = '일'; $('weekday').textContent = WEEK[d.getDay()]; }
+    else { $('datebig').textContent = m; $('dunit').textContent = '월'; $('weekday').textContent = '미리보기'; }
     deselect();
   }
   function deselect() {
@@ -82,7 +82,7 @@
     const box = $('collage'); box.innerHTML = '';
     const rect = box.getBoundingClientRect(); stageW = rect.width || 280; stageH = rect.height || 160;
     // field extends beyond the visible frame so foods swim in and out
-    const mx = stageW * 0.6, my = stageH * 0.6;
+    const mx = stageW * 0.35, my = stageH * 0.35;
     fx0 = -mx; fx1 = stageW + mx; fy0 = -my; fy1 = stageH + my;
     // all of the month's foods become particles (small frame caps for space)
     let chosen = pool.slice();

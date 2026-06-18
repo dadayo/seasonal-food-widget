@@ -38,16 +38,17 @@
   @keyframes inR{from{transform:translateX(38%);opacity:.4}to{transform:none;opacity:1}}
   @keyframes inL{from{transform:translateX(-38%);opacity:.4}to{transform:none;opacity:1}}
 
-  .top{display:flex;justify-content:space-between;align-items:center;flex:none;z-index:2;}
-  .navwrap{display:flex;align-items:center;gap:7px;}
-  .mon{font-weight:800;color:var(--accent);letter-spacing:-.2px;font-size:17px;}
-  .nav{font-size:18px;font-weight:800;color:var(--accent);cursor:pointer;line-height:1;
-    -webkit-app-region:no-drag;width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+  .top{display:flex;justify-content:space-between;align-items:center;flex:none;z-index:2;gap:6px;}
+  .ttl{flex:1;text-align:center;font-weight:800;color:var(--accent);letter-spacing:-.4px;font-size:19px;
+    display:inline-flex;flex-direction:column;align-items:center;line-height:1.05;}
+  .ttl small{font-size:8.5px;font-weight:700;color:var(--muted);letter-spacing:1.5px;margin-top:1px;}
+  .nav{font-size:19px;font-weight:800;color:var(--accent);cursor:pointer;line-height:1;flex:none;
+    -webkit-app-region:no-drag;width:26px;height:26px;display:flex;align-items:center;justify-content:center;
     border-radius:50%;opacity:.55;transition:opacity .12s,background .12s;}
-  .nav:hover{opacity:1;background:color-mix(in srgb, var(--accent) 14%, transparent);}
-  .weekday{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;}
-  [data-size="s"] .mon{font-size:15px;} [data-size="s"] .nav{font-size:16px;width:21px;height:21px;}
-  [data-size="l"] .mon{font-size:19px;} [data-size="l"] .nav{font-size:20px;width:26px;height:26px;}
+  .nav:hover{opacity:1;background:color-mix(in srgb, var(--accent) 16%, transparent);}
+  .wkd{font-size:12px;font-weight:700;color:var(--muted);align-self:flex-end;margin:0 0 5px 3px;}
+  [data-size="s"] .ttl{font-size:16px;} [data-size="s"] .nav{font-size:16px;width:22px;height:22px;}
+  [data-size="l"] .ttl{font-size:22px;} [data-size="l"] .nav{font-size:22px;width:28px;height:28px;}
 
   /* collage of the month's seasonal foods, printed in one ink (duotone) */
   .stage{flex:1;position:relative;margin:4px 0;overflow:hidden;}
@@ -84,12 +85,14 @@
     </div>
     <div class="page" id="page">
       <div class="top">
-        <span class="navwrap"><span class="nav" id="prev">‹</span><span class="mon" id="mon">6월 · JUNE</span><span class="nav" id="next">›</span></span>
-        <span class="weekday" id="weekday">목요일</span>
+        <span class="nav" id="prev">‹</span>
+        <span class="ttl" id="mon">6월 제철 재료<small>JUNE · SEASONAL</small></span>
+        <span class="nav" id="next">›</span>
       </div>
       <div class="stage"><div class="collage" id="collage"></div></div>
       <div class="daterow">
         <span class="datebig" id="datebig">18</span><span class="dunit" id="dunit">일</span>
+        <span class="wkd" id="weekday">목</span>
         <span class="caption" id="caption">이달의 제철<small id="capsub"></small></span>
       </div>
       <div class="foot"><span id="today">제철 달력</span><span class="cnt" id="cnt"></span></div>
