@@ -4,8 +4,8 @@
   const CAT = { produce:'농산물', seafood:'해산물', fruit:'과일' };
   const COLOR = ['#3E68A8','#5E9AA6','#E0608F','#4FA873','#36A85C','#129E93',
                  '#F0594B','#E84B62','#D9851F','#DA6A22','#B85436','#3A66A6'];
-  const COUNT = { s:5, m:8, l:9 };
-  const PSIZE = { s:42, m:58, l:76 };
+  const COUNT = { s:4, m:6, l:7 };
+  const PSIZE = { s:48, m:64, l:84 };
   const $ = id => document.getElementById(id);
   const SLUG = window.SLUG || {}, RECIPES = window.RECIPES || {};
   const cm = () => new Date().getMonth() + 1;
@@ -73,11 +73,11 @@
 
     parts = chosen.map((it, i) => {
       const im = imgEl(it, size); box.appendChild(im);
-      const r = size/2;
-      const ang = rnd(0, Math.PI*2), sp = rnd(0.18, 0.42);
+      const r = size * 0.44; // collision radius ~ visible art (PNG has transparent margin)
+      const ang = rnd(0, Math.PI*2), sp = rnd(0.5, 0.9);
       return { el:im, it, r,
         x: rnd(r, Math.max(r, stageW-r)), y: rnd(r, Math.max(r, stageH-r)),
-        vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, rot: rnd(-6,6), vr: rnd(-0.15,0.15) };
+        vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, rot: rnd(-6,6), vr: rnd(-0.22,0.22) };
     });
     render();
     if (!raf) raf = requestAnimationFrame(step);
@@ -101,7 +101,7 @@
         for (let j = i+1; j < parts.length; j++) {
           const a = parts[i], b = parts[j];
           const dx = b.x-a.x, dy = b.y-a.y; const d = Math.hypot(dx,dy) || 0.001;
-          const min = (a.r + b.r) * 0.82;
+          const min = (a.r + b.r); // touch edges → crisp bounce (no overlap)
           if (d < min) {
             const nx = dx/d, ny = dy/d, ov = (min-d)/2;
             a.x -= nx*ov; a.y -= ny*ov; b.x += nx*ov; b.y += ny*ov;
