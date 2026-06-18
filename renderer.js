@@ -1,8 +1,7 @@
 (function () {
-  const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
-  const SEASON = { 12:'WINTER',1:'WINTER',2:'WINTER',3:'SPRING',4:'SPRING',5:'SPRING',6:'SUMMER',7:'SUMMER',8:'SUMMER',9:'AUTUMN',10:'AUTUMN',11:'AUTUMN' };
+  const EN = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const WEEK = ['일','월','화','수','목','금','토'];
   const CAT = { produce:'농산물', seafood:'해산물', fruit:'과일' };
-  // per-month point color (winter blues → spring pink/green → summer teal/coral → autumn amber)
   const COLOR = ['#4071B6','#5E9AA6','#F26BA0','#57B27A','#3FAE63','#16A89C',
                  '#FF6B5C','#F0556B','#E0902B','#E2722B','#BE5A3C','#3F6FB0'];
   const $ = id => document.getElementById(id);
@@ -17,11 +16,21 @@
     for (const c of ['produce','seafood','fruit'])
       data[c].forEach(([name,emoji]) => pool.push({ cat:c, name, emoji }));
     $('card').style.setProperty('--accent', COLOR[m-1]);
-    $('mon').textContent = MONTHS[m-1] + ' 제철';
-    $('season').textContent = SEASON[m];
-    $('bignum').textContent = m;
+    $('mon').textContent = m + '월 · ' + EN[m-1];
     $('cnt').innerHTML = '제철 <b>' + pool.length + '</b>종';
-    $('today').textContent = manual ? '다른 달 미리보기' : '오늘의 제철';
+    // date area: real date for current month, month-preview otherwise
+    const d = new Date();
+    if (m === cm()) {
+      $('datebig').textContent = d.getDate();
+      $('dunit').textContent = '일';
+      $('weekday').textContent = WEEK[d.getDay()] + '요일';
+      $('today').textContent = '오늘의 제철';
+    } else {
+      $('datebig').textContent = m;
+      $('dunit').textContent = '월';
+      $('weekday').textContent = '제철 미리보기';
+      $('today').textContent = m + '월 제철';
+    }
     const peek = $('peek'); peek.innerHTML = '';
     pool.forEach((it, i) => {
       const p = document.createElement('div'); p.className = 'p'; p.dataset.i = i;
@@ -40,7 +49,7 @@
     $('fcat').textContent = CAT[it.cat];
     $('fname').textContent = it.name;
     const em = $('femoji'), fimg = $('fimg'), slug = SLUG[it.name];
-    const tilt = ((it.name.length * 7 + i * 13) % 9) - 4; // -4..4°, organic placement
+    const tilt = ((it.name.length * 7 + i * 13) % 9) - 4;
     fimg.style.transform = 'rotate(' + tilt + 'deg)';
     em.style.transform = 'rotate(' + tilt + 'deg)';
     const showEmoji = () => { fimg.style.display='none'; em.style.display='inline'; em.textContent = it.emoji; };
@@ -54,9 +63,7 @@
     const pp = document.querySelector('.peek .p[data-i="'+i+'"]'); if (pp) pp.classList.add('on');
   }
 
-  // clone current page as an overlay, run update underneath, then animate overlay away.
-  // mode 'tear'  = diagonal tear-off (food change)
-  // mode 'slide' = horizontal swipe (month change); dir 'next'|'prev'
+  // overlay-based transitions: 'tear' (food), 'slide' (month)
   let turning = false;
   function turn(update, mode, dir) {
     if (turning) { update(); return; }
@@ -69,8 +76,8 @@
     let dur;
     if (mode === 'slide') {
       dur = 700;
-      ov.classList.add(dir === 'next' ? 'slideL' : 'slideR');     // old page swipes aside
-      page.classList.add(dir === 'next' ? 'inR' : 'inL');         // new page eases in
+      ov.classList.add(dir === 'next' ? 'slideL' : 'slideR');
+      page.classList.add(dir === 'next' ? 'inR' : 'inL');
       setTimeout(() => { page.classList.remove('inR','inL'); }, 640);
     } else {
       dur = 1120;
@@ -95,15 +102,14 @@
 
   let hover = false;
   function stop(){ if (timer) { clearInterval(timer); timer = null; } }
-  function arm(){ stop(); if (!hover) timer = setInterval(next, 9000); } // idempotent + hover-aware
+  function arm(){ stop(); if (!hover) timer = setInterval(next, 9000); }
   function restart(){ arm(); }
 
   function tick() {
     const k = new Date().toDateString();
-    if (k !== dayKey) { dayKey = k; if (!manual) setMonth(cm()); } // resync daily / on month change
+    if (k !== dayKey) { dayKey = k; if (!manual) setMonth(cm()); } // new day / month → resync
   }
 
-  // interactions
   $('imgwrap').onclick = () => goto(cur + 1);
   $('recipe').onclick = () => window.api && window.api.openRecipe(pool[cur].name);
   $('prev').onclick = () => setMonth(viewMonth - 1, 'prev');
@@ -117,7 +123,6 @@
     window.api.onSize(s => { card.dataset.size = s; });
   }
 
-  // init
   dayKey = new Date().toDateString();
   build(viewMonth);
   cur = new Date().getDate() % pool.length;
