@@ -4,7 +4,7 @@
   const CAT = { produce:'농산물', seafood:'해산물', fruit:'과일' };
   const COLOR = ['#3E68A8','#5E9AA6','#E0608F','#4FA873','#36A85C','#129E93',
                  '#F0594B','#E84B62','#D9851F','#DA6A22','#B85436','#3A66A6'];
-  const PSIZE = { s:44, m:52, l:64 };
+  const PSIZE = { s:50, m:66, l:82 };
   const SMALL_CAP = 10;          // small frame shows fewer
   const MAXV = 8, MINV = 0.55, DAMP = 0.992;
   const $ = id => document.getElementById(id);
@@ -26,38 +26,39 @@
     else { $('datebig').textContent = m; $('dunit').textContent = '월'; $('weekday').textContent = '미리보기'; }
     deselect();
   }
-  function deselect() {
-    selected = null;
-    parts.forEach(p => { p.el.classList.remove('sel'); p.lab.textContent = p.it.name; });
-    $('caption').firstChild.textContent = '이달의 제철'; $('capsub').textContent = pool.length + '종';
-    $('today').textContent = '잡아서 던져보세요'; $('today').onclick = null;
+  // big-name display (separate spot) — shows on hover, sticks with recipe on click
+  function showName(it, withRecipe) {
+    $('namebig').textContent = it.name; $('namebig').classList.add('active');
+    if (withRecipe) { const r = RECIPES[it.name];
+      $('namerec').innerHTML = r ? (r.join(' · ') + ' <span class="go-r">레시피 →</span>') : '<span class="go-r">레시피 검색 →</span>'; }
+    else $('namerec').textContent = '';
   }
+  function revertName() {
+    if (selected) { showName(selected.it, true); return; }
+    $('namebig').textContent = '이달의 제철 ' + pool.length + '종'; $('namebig').classList.remove('active');
+    $('namerec').textContent = '';
+  }
+  function deselect() { selected = null; parts.forEach(p => p.el.classList.remove('sel')); revertName(); }
   function select(p) {
-    selected = p;
-    parts.forEach(q => { q.el.classList.toggle('sel', q === p); if (q !== p) q.lab.textContent = q.it.name; });
-    const r = RECIPES[p.it.name];
-    p.lab.textContent = r ? (p.it.name + ' · ' + r.join('·')) : p.it.name;   // 오이 · 오이소박이
-    $('caption').firstChild.textContent = p.it.name; $('capsub').textContent = CAT[p.it.cat];
-    $('today').innerHTML = r ? '<span class="go-r">레시피 검색 →</span>' : '<span class="go-r">레시피 검색 →</span>';
-    $('today').onclick = () => window.api && window.api.openRecipe(p.it.name);
+    selected = p; parts.forEach(q => q.el.classList.toggle('sel', q === p));
+    showName(p.it, true);
   }
 
   function stageRect(){ return $('collage').getBoundingClientRect(); }
 
   function makePim(it, size) {
-    const w = document.createElement('div'); w.className = 'pim'; w.title = it.name;
-    const im = document.createElement('img'); im.className = 'pim-img';
-    im.src = 'assets/' + SLUG[it.name] + '.png'; im.style.width = size + 'px';
-    const lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = it.name;
-    w.appendChild(im); w.appendChild(lab);
-    w.addEventListener('pointerdown', (e) => {
+    const im = document.createElement('img'); im.className = 'pim';
+    im.src = 'assets/' + SLUG[it.name] + '.png'; im.style.width = size + 'px'; im.title = it.name;
+    im.addEventListener('pointerdown', (e) => {
       e.preventDefault();
-      const p = parts.find(q => q.el === w); if (!p) return;
+      const p = parts.find(q => q.el === im); if (!p) return;
       const r = stageRect();
       drag = { p, offx:(e.clientX-r.left)-p.x, offy:(e.clientY-r.top)-p.y, vx:0, vy:0, sx:e.clientX, sy:e.clientY, moved:false };
-      p.grabbed = true; w.style.cursor = 'grabbing';
+      p.grabbed = true; im.style.cursor = 'grabbing';
     });
-    return { w, im, lab };
+    im.addEventListener('pointerenter', () => { const p = parts.find(q => q.el === im); if (p && p !== selected) showName(p.it, false); });
+    im.addEventListener('pointerleave', () => revertName());
+    return im;
   }
 
   document.addEventListener('pointermove', (e) => {
@@ -95,9 +96,9 @@
     if ($('card').dataset.size === 's') chosen = chosen.slice(0, SMALL_CAP);
     drag = null;
     parts = chosen.map((it) => {
-      const m = makePim(it, size); box.appendChild(m.w);
+      const im = makePim(it, size); box.appendChild(im);
       const r = size * 0.44, ang = rnd(0, Math.PI*2), sp = rnd(0.7, 1.2);
-      return { el:m.w, img:m.im, lab:m.lab, size, it, r, x: rnd(fx0+r, fx1-r), y: rnd(fy0+r, fy1-r),
+      return { el:im, size, it, r, x: rnd(fx0+r, fx1-r), y: rnd(fy0+r, fy1-r),
         vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, rot: rnd(-6,6), vr: rnd(-0.25,0.25), grabbed:false };
     });
     render();
@@ -105,10 +106,8 @@
   }
 
   function render() {
-    for (const p of parts) {
-      p.el.style.transform = 'translate(' + (p.x - p.size/2) + 'px,' + (p.y - p.size/2) + 'px)';
-      p.img.style.transform = 'rotate(' + p.rot + 'deg)';   // rotate art only, label stays upright
-    }
+    for (const p of parts)
+      p.el.style.transform = 'translate(' + (p.x - p.size/2) + 'px,' + (p.y - p.size/2) + 'px) rotate(' + p.rot + 'deg)';
   }
 
   function step() {
@@ -163,7 +162,7 @@
 
   $('prev').onclick = () => setMonth(viewMonth - 1, 'prev');
   $('next').onclick = () => setMonth(viewMonth + 1, 'next');
-  $('caption').onclick = () => { if (selected && window.api) window.api.openRecipe(selected.it.name); };
+  $('namerec').onclick = () => { if (selected && window.api) window.api.openRecipe(selected.it.name); };
   document.querySelector('.stage').addEventListener('pointerdown', (e) => { if (!e.target.closest('.pim')) deselect(); });
 
   if (window.api) {

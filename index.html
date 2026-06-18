@@ -53,22 +53,24 @@
   /* collage of the month's seasonal foods, printed in one ink (duotone) */
   .stage{flex:1;position:relative;margin:4px 0;overflow:hidden;}
   .collage{position:absolute;inset:0;}
-  .collage .pim{position:absolute;top:0;left:0;display:flex;flex-direction:column;align-items:center;
-    -webkit-app-region:no-drag;cursor:grab;touch-action:none;will-change:transform;z-index:1;}
+  .collage .pim{position:absolute;top:0;left:0;-webkit-app-region:no-drag;cursor:grab;touch-action:none;
+    filter:drop-shadow(0 3px 5px #0000001f);will-change:transform;transition:opacity .35s ease,filter .15s ease;z-index:1;}
   .collage .pim:active{cursor:grabbing;}
-  .collage .pim.sel{z-index:6;}
-  .collage .pim-img{display:block;filter:drop-shadow(0 3px 5px #0000001f);transition:opacity .35s ease;}
-  .collage .pim:hover .pim-img{filter:drop-shadow(0 6px 11px #0000003c);}
-  .collage .lab{margin-top:-3px;font-size:9.5px;font-weight:700;color:#4a443c;background:#fbfaf6dd;
-    padding:1px 6px;border-radius:7px;white-space:nowrap;box-shadow:0 1px 2px #00000016;
-    max-width:140px;overflow:hidden;text-overflow:ellipsis;pointer-events:none;}
-  .collage .pim.sel .lab{background:var(--accent);color:#fff;font-weight:800;}
+  .collage .pim:hover{filter:drop-shadow(0 7px 12px #00000042);z-index:6;}
+  .collage .pim.sel{filter:drop-shadow(0 0 0 3px var(--accent)) drop-shadow(0 5px 9px #00000033);z-index:6;}
 
   .daterow{display:flex;align-items:flex-end;gap:8px;flex:none;}
   .datebig{font-weight:900;color:var(--accent);letter-spacing:-2px;line-height:.85;}
   .dunit{font-weight:800;color:var(--accent);opacity:.85;margin-bottom:3px;}
-  .caption{margin-left:auto;text-align:right;font-size:12px;font-weight:800;color:var(--ink);align-self:flex-end;margin-bottom:3px;}
-  .caption small{display:block;font-size:9px;color:var(--muted);font-weight:600;}
+  .namebox{margin-left:auto;text-align:right;align-self:flex-end;max-width:64%;}
+  .namebig{display:block;font-weight:800;color:var(--muted);font-size:13px;line-height:1.02;letter-spacing:-.3px;
+    transition:font-size .16s ease,color .16s ease;}
+  .namebig.active{color:var(--accent);}
+  .namerec{display:block;font-size:10px;color:#5d564c;font-weight:600;margin-top:3px;-webkit-app-region:no-drag;}
+  .namerec .go-r{color:var(--accent);font-weight:800;cursor:pointer;}
+  [data-size="s"] .namebig.active{font-size:19px;}
+  [data-size="m"] .namebig.active{font-size:27px;}
+  [data-size="l"] .namebig.active{font-size:34px;}
 
   .foot{display:flex;justify-content:space-between;align-items:center;flex:none;margin-top:10px;padding-top:8px;border-top:1px solid #00000012;font-size:10px;font-weight:600;color:var(--muted);gap:8px;}
   .foot .cnt{flex:none;} .foot .cnt b{color:var(--ink);font-weight:800;}
@@ -98,7 +100,7 @@
       <div class="daterow">
         <span class="datebig" id="datebig">18</span><span class="dunit" id="dunit">일</span>
         <span class="wkd" id="weekday">목</span>
-        <span class="caption" id="caption">이달의 제철<small id="capsub"></small></span>
+        <span class="namebox"><span class="namebig" id="namebig">이달의 제철</span><small class="namerec" id="namerec"></small></span>
       </div>
       <div class="foot"><span id="today">제철 달력</span><span class="cnt" id="cnt"></span></div>
     </div>
