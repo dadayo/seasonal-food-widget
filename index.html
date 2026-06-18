@@ -48,8 +48,9 @@
   /* collage of the month's seasonal foods, printed in one ink (duotone) */
   .stage{flex:1;position:relative;margin:4px 0;overflow:hidden;}
   .collage{position:absolute;inset:0;}
-  .collage .pim{position:absolute;top:0;left:0;object-fit:contain;-webkit-app-region:no-drag;cursor:pointer;
-    filter:drop-shadow(0 3px 5px #0000001f);will-change:transform;transition:opacity .35s ease;}
+  .collage .pim{position:absolute;top:0;left:0;object-fit:contain;-webkit-app-region:no-drag;cursor:grab;
+    touch-action:none;filter:drop-shadow(0 3px 5px #0000001f);will-change:transform;transition:opacity .35s ease;}
+  .collage .pim:active{cursor:grabbing;}
   .collage .pim:hover{filter:drop-shadow(0 6px 11px #0000003c);}
   .collage .pim.sel{filter:drop-shadow(0 0 0 2px var(--accent)) drop-shadow(0 5px 9px #00000033);}
 
