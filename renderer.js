@@ -19,7 +19,7 @@
 
   function header(m) {
     $('card').style.setProperty('--accent', COLOR[m-1]);
-    $('mon').innerHTML = '<span class="ln">' + m + '월 <span class="c">제철 재료</span></span><small>' + EN[m-1] + ' · SEASONAL</small>';
+    $('mon').innerHTML = '<span class="ln">' + m + '월</span><small>' + EN[m-1] + ' · SEASONAL</small>';
     $('cnt').textContent = '';
     const d = new Date();
     if (m === cm()) { $('datebig').textContent = d.getDate(); $('dunit').textContent = '일'; $('weekday').textContent = WEEK[d.getDay()]; }
