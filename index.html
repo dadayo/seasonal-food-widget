@@ -63,14 +63,14 @@
   .datebig{font-weight:900;color:var(--accent);letter-spacing:-2px;line-height:.85;}
   .dunit{font-weight:800;color:var(--accent);opacity:.85;margin-bottom:3px;}
   .namebox{margin-left:auto;text-align:right;align-self:flex-end;max-width:64%;}
-  .namebig{display:block;font-weight:800;color:var(--muted);font-size:13px;line-height:1.02;letter-spacing:-.3px;
-    transition:font-size .16s ease,color .16s ease;}
-  .namebig.active{color:var(--accent);}
+  .namebig{display:block;font-weight:800;color:var(--muted);font-size:14px;line-height:1.15;letter-spacing:-.3px;
+    transition:color .15s ease;}
+  .namebig.active{color:#1e1c18;}   /* 검정 느낌 */
   .namerec{display:block;font-size:10px;color:#5d564c;font-weight:600;margin-top:3px;-webkit-app-region:no-drag;}
   .namerec .go-r{color:var(--accent);font-weight:800;cursor:pointer;}
-  [data-size="s"] .namebig.active{font-size:19px;}
-  [data-size="m"] .namebig.active{font-size:27px;}
-  [data-size="l"] .namebig.active{font-size:34px;}
+  [data-size="s"] .namebig{font-size:13px;}
+  [data-size="m"] .namebig{font-size:15px;}
+  [data-size="l"] .namebig{font-size:17px;}
 
   .foot{display:flex;justify-content:space-between;align-items:center;flex:none;margin-top:10px;padding-top:8px;border-top:1px solid #00000012;font-size:10px;font-weight:600;color:var(--muted);gap:8px;}
   .foot .cnt{flex:none;} .foot .cnt b{color:var(--ink);font-weight:800;}
