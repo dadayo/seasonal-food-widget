@@ -19,11 +19,11 @@
 
   function header(m) {
     $('card').style.setProperty('--accent', COLOR[m-1]);
-    $('mon').innerHTML = m + '월 제철 재료<small>' + EN[m-1] + ' · SEASONAL</small>';
-    $('cnt').innerHTML = '제철 <b>' + pool.length + '</b>종';
+    $('mon').innerHTML = '<span class="ln">' + m + '월 <span class="c">제철 재료</span></span><small>' + EN[m-1] + ' · SEASONAL</small>';
+    $('cnt').textContent = '';
     const d = new Date();
     if (m === cm()) { $('datebig').textContent = d.getDate(); $('dunit').textContent = '일'; $('weekday').textContent = WEEK[d.getDay()]; }
-    else { $('datebig').textContent = m; $('dunit').textContent = '월'; $('weekday').textContent = '미리보기'; }
+    else { $('datebig').textContent = m; $('dunit').textContent = '월'; $('weekday').textContent = ''; }
     deselect();
   }
   // name + recipe display (separate spot) — shows on hover AND click
@@ -36,7 +36,7 @@
   function revertName() {
     if (selected) { showName(selected.it); return; }
     shownIt = null;
-    $('namebig').textContent = '이달의 제철 ' + pool.length + '종'; $('namebig').classList.remove('active');
+    $('namebig').textContent = ''; $('namebig').classList.remove('active');
     $('namerec').textContent = '';
   }
   function deselect() { selected = null; parts.forEach(p => p.el.classList.remove('sel')); revertName(); }
