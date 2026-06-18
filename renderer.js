@@ -4,25 +4,55 @@
   const CAT = { produce:'농산물', seafood:'해산물', fruit:'과일' };
   const COLOR = ['#3E68A8','#5E9AA6','#E0608F','#4FA873','#36A85C','#129E93',
                  '#F0594B','#E84B62','#D9851F','#DA6A22','#B85436','#3A66A6'];
-  // collage slots per size (percent box): left, top, size%, base rotation
-  const POS_BY = {
-    s: [ {l:5,t:12,s:30,r:-6},{l:37,t:4,s:34,r:5},{l:68,t:16,s:30,r:-5} ],
-    m: [ {l:4,t:5,s:27,r:-5},{l:38,t:1,s:30,r:5},{l:71,t:7,s:26,r:-4},
-         {l:7,t:50,s:28,r:4},{l:40,t:52,s:30,r:-6},{l:70,t:48,s:26,r:7} ],
-    l: [ {l:2,t:5,s:30,r:-6},{l:37,t:0,s:33,r:5},{l:71,t:7,s:29,r:-4},
-         {l:4,t:50,s:31,r:4},{l:38,t:53,s:33,r:-6},{l:70,t:49,s:29,r:7} ]
-  };
+  const COUNT = { s:5, m:8, l:9 };
+  const PSIZE = { s:42, m:58, l:76 };
   const $ = id => document.getElementById(id);
   const SLUG = window.SLUG || {}, RECIPES = window.RECIPES || {};
   const cm = () => new Date().getMonth() + 1;
+  const rnd = (a,b) => a + Math.random()*(b-a);
 
   let pool = [], viewMonth = cm(), manual = false, dayKey = '';
+  let parts = [], paused = false, stageW = 0, stageH = 0, raf = null, selected = null;
 
-  function pickFoods(n) {
-    const N = pool.length, out = [];
-    const step = N / Math.min(n, N);
-    for (let k = 0; k < Math.min(n, N); k++) out.push(pool[Math.floor(k*step) % N]);
-    return out;
+  function header(m) {
+    $('card').style.setProperty('--accent', COLOR[m-1]);
+    $('mon').textContent = m + '월 · ' + EN[m-1];
+    $('cnt').innerHTML = '제철 <b>' + pool.length + '</b>종';
+    const d = new Date();
+    if (m === cm()) {
+      $('datebig').textContent = d.getDate(); $('dunit').textContent = '일';
+      $('weekday').textContent = WEEK[d.getDay()] + '요일';
+    } else {
+      $('datebig').textContent = m; $('dunit').textContent = '월';
+      $('weekday').textContent = '제철 미리보기';
+    }
+    deselect();
+  }
+
+  function deselect() {
+    selected = null;
+    parts.forEach(p => p.el.classList.remove('sel'));
+    $('caption').firstChild.textContent = '이달의 제철';
+    $('capsub').textContent = pool.length + '종';
+    $('today').textContent = '제철 달력'; $('today').onclick = null;
+  }
+  function select(p) {
+    selected = p;
+    parts.forEach(q => q.el.classList.toggle('sel', q === p));
+    $('caption').firstChild.textContent = p.it.name;
+    $('capsub').textContent = CAT[p.it.cat];
+    const r = RECIPES[p.it.name];
+    $('today').innerHTML = r ? ('추천 <b>' + r.join(' · ') + '</b> <span class="go-r">레시피 →</span>')
+                             : '<span class="go-r">레시피 검색 →</span>';
+    $('today').onclick = () => window.api && window.api.openRecipe(p.it.name);
+  }
+
+  function imgEl(it, size) {
+    const im = document.createElement('img');
+    im.className = 'pim'; im.src = 'assets/' + SLUG[it.name] + '.png';
+    im.style.width = size + 'px'; im.title = it.name;
+    im.onclick = (e) => { e.stopPropagation(); select(parts.find(p => p.el === im)); };
+    return im;
   }
 
   function build(m) {
@@ -30,39 +60,74 @@
     pool = [];
     for (const c of ['produce','seafood','fruit'])
       data[c].forEach(([name,emoji]) => pool.push({ cat:c, name, emoji }));
-    $('card').style.setProperty('--accent', COLOR[m-1]);
-    $('mon').textContent = m + '월 · ' + EN[m-1];
-    $('cnt').innerHTML = '제철 <b>' + pool.length + '</b>종';
-    const d = new Date();
-    if (m === cm()) {
-      $('datebig').textContent = d.getDate(); $('dunit').textContent = '일';
-      $('weekday').textContent = WEEK[d.getDay()] + '요일'; $('today').textContent = '제철 달력';
-    } else {
-      $('datebig').textContent = m; $('dunit').textContent = '월';
-      $('weekday').textContent = '제철 미리보기'; $('today').textContent = '제철 달력';
-    }
-    // collage (count/layout per current size)
-    const POS = POS_BY[$('card').dataset.size] || POS_BY.m;
+    pool = pool.filter(it => SLUG[it.name]);
+    header(m);
+
+    const size = PSIZE[$('card').dataset.size] || PSIZE.m;
+    const n = Math.min(COUNT[$('card').dataset.size] || COUNT.m, pool.length);
     const box = $('collage'); box.innerHTML = '';
-    const foods = pickFoods(POS.length);
-    foods.forEach((it, i) => {
-      const slug = SLUG[it.name]; if (!slug) return;
-      const p = POS[i];
-      const slot = document.createElement('div'); slot.className = 'slot';
-      slot.style.left = p.l + '%'; slot.style.top = p.t + '%'; slot.style.width = p.s + '%';
-      slot.style.transform = 'rotate(' + p.r + 'deg)';
-      const im = document.createElement('img');
-      im.src = 'assets/' + slug + '.png'; im.title = it.name;
-      im.style.setProperty('--dur', (3.4 + Math.random()*2.8).toFixed(2) + 's');
-      im.style.setProperty('--del', (-Math.random()*3).toFixed(2) + 's');
-      im.onmouseenter = () => { $('caption').firstChild.textContent = it.name; $('capsub').textContent = CAT[it.cat]; };
-      im.onmouseleave = () => { $('caption').firstChild.textContent = '이달의 제철'; $('capsub').textContent = ''; };
-      im.onclick = () => window.api && window.api.openRecipe(it.name);
-      slot.appendChild(im); box.appendChild(slot);
+    const rect = box.getBoundingClientRect(); stageW = rect.width || 280; stageH = rect.height || 160;
+    // choose a spread of foods
+    const chosen = []; const step = pool.length / n;
+    for (let k = 0; k < n; k++) chosen.push(pool[Math.floor(k*step) % pool.length]);
+
+    parts = chosen.map((it, i) => {
+      const im = imgEl(it, size); box.appendChild(im);
+      const r = size/2;
+      const ang = rnd(0, Math.PI*2), sp = rnd(0.18, 0.42);
+      return { el:im, it, r,
+        x: rnd(r, Math.max(r, stageW-r)), y: rnd(r, Math.max(r, stageH-r)),
+        vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, rot: rnd(-6,6), vr: rnd(-0.15,0.15) };
     });
+    render();
+    if (!raf) raf = requestAnimationFrame(step);
   }
 
-  // month slide transition
+  function render() {
+    for (const p of parts) p.el.style.transform =
+      'translate(' + (p.x-p.r) + 'px,' + (p.y-p.r) + 'px) rotate(' + p.rot + 'deg)';
+  }
+
+  function step() {
+    if (!paused && parts.length) {
+      for (const p of parts) {
+        p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+        if (p.x - p.r < 0) { p.x = p.r; p.vx = Math.abs(p.vx); }
+        if (p.x + p.r > stageW) { p.x = stageW - p.r; p.vx = -Math.abs(p.vx); }
+        if (p.y - p.r < 0) { p.y = p.r; p.vy = Math.abs(p.vy); }
+        if (p.y + p.r > stageH) { p.y = stageH - p.r; p.vy = -Math.abs(p.vy); }
+      }
+      for (let i = 0; i < parts.length; i++)
+        for (let j = i+1; j < parts.length; j++) {
+          const a = parts[i], b = parts[j];
+          const dx = b.x-a.x, dy = b.y-a.y; const d = Math.hypot(dx,dy) || 0.001;
+          const min = (a.r + b.r) * 0.82;
+          if (d < min) {
+            const nx = dx/d, ny = dy/d, ov = (min-d)/2;
+            a.x -= nx*ov; a.y -= ny*ov; b.x += nx*ov; b.y += ny*ov;
+            const va = a.vx*nx + a.vy*ny, vb = b.vx*nx + b.vy*ny, diff = vb - va;
+            a.vx += diff*nx; a.vy += diff*ny; b.vx -= diff*nx; b.vy -= diff*ny;
+          }
+        }
+      render();
+    }
+    raf = requestAnimationFrame(step);
+  }
+
+  // periodically swap one drifting food for another not currently shown → over time you see all
+  function swapOne() {
+    if (paused || parts.length === 0 || pool.length <= parts.length) return;
+    const shown = new Set(parts.map(p => p.it.name));
+    const fresh = pool.filter(it => !shown.has(it.name));
+    if (!fresh.length) return;
+    const p = parts[Math.floor(Math.random()*parts.length)];
+    if (p === selected) return;
+    const it = fresh[Math.floor(Math.random()*fresh.length)];
+    p.el.style.opacity = '0';
+    setTimeout(() => { p.it = it; p.el.src = 'assets/' + SLUG[it.name] + '.png'; p.el.title = it.name; p.el.style.opacity = '1'; }, 350);
+  }
+
+  // month slide
   let turning = false;
   function turn(update, dir) {
     if (turning) { update(); return; }
@@ -78,11 +143,7 @@
     setTimeout(() => { if (ov.parentNode) ov.remove(); turning = false; }, 700);
   }
   function setMonth(m, dir) {
-    turn(() => {
-      viewMonth = ((m - 1 + 12) % 12) + 1;
-      manual = (viewMonth !== cm());
-      build(viewMonth);
-    }, dir || 'next');
+    turn(() => { viewMonth = ((m-1+12)%12)+1; manual = (viewMonth !== cm()); build(viewMonth); }, dir || 'next');
   }
 
   function tick() {
@@ -92,13 +153,20 @@
 
   $('prev').onclick = () => setMonth(viewMonth - 1, 'prev');
   $('next').onclick = () => setMonth(viewMonth + 1, 'next');
+  $('caption').onclick = () => { if (selected && window.api) window.api.openRecipe(selected.it.name); };
+  const card = $('card');
+  card.addEventListener('mouseenter', () => { paused = true; });
+  card.addEventListener('mouseleave', () => { paused = false; });
+  // click empty area deselects
+  document.querySelector('.stage').addEventListener('click', (e) => { if (e.target.classList.contains('pim')) return; deselect(); });
 
   if (window.api) {
-    window.api.getSize().then(s => { if (s) { $('card').dataset.size = s; build(viewMonth); } }).catch(()=>{});
-    window.api.onSize(s => { $('card').dataset.size = s; build(viewMonth); });
+    window.api.getSize().then(s => { if (s) { card.dataset.size = s; build(viewMonth); } }).catch(()=>{});
+    window.api.onSize(s => { card.dataset.size = s; build(viewMonth); });
   }
 
   dayKey = new Date().toDateString();
   build(viewMonth);
   setInterval(tick, 60*1000);
+  setInterval(swapOne, 8000);
 })();

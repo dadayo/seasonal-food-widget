@@ -48,21 +48,22 @@
   /* collage of the month's seasonal foods, printed in one ink (duotone) */
   .stage{flex:1;position:relative;margin:4px 0;overflow:hidden;}
   .collage{position:absolute;inset:0;}
-  .collage .slot{position:absolute;}
-  .collage img{width:100%;display:block;object-fit:contain;-webkit-app-region:no-drag;cursor:pointer;
-    filter:drop-shadow(0 3px 5px #0000001f);
-    animation:floaty var(--dur,4s) var(--del,0s) infinite alternate ease-in-out;}
-  .collage img:hover{filter:drop-shadow(0 6px 10px #00000036);}
-  @keyframes floaty{from{transform:translateY(-3px) rotate(-1.6deg)}to{transform:translateY(4px) rotate(1.6deg)}}
+  .collage .pim{position:absolute;top:0;left:0;object-fit:contain;-webkit-app-region:no-drag;cursor:pointer;
+    filter:drop-shadow(0 3px 5px #0000001f);will-change:transform;transition:opacity .35s ease;}
+  .collage .pim:hover{filter:drop-shadow(0 6px 11px #0000003c);}
+  .collage .pim.sel{filter:drop-shadow(0 0 0 2px var(--accent)) drop-shadow(0 5px 9px #00000033);}
 
   .daterow{display:flex;align-items:flex-end;gap:8px;flex:none;}
   .datebig{font-weight:900;color:var(--accent);letter-spacing:-2px;line-height:.85;}
   .dunit{font-weight:800;color:var(--accent);opacity:.85;margin-bottom:3px;}
-  .caption{margin-left:auto;text-align:right;font-size:11px;font-weight:700;color:var(--ink);align-self:flex-end;margin-bottom:3px;}
+  .caption{margin-left:auto;text-align:right;font-size:12px;font-weight:800;color:var(--ink);align-self:flex-end;margin-bottom:3px;}
   .caption small{display:block;font-size:9px;color:var(--muted);font-weight:600;}
 
-  .foot{display:flex;justify-content:space-between;align-items:center;flex:none;margin-top:10px;padding-top:8px;border-top:1px solid #00000012;font-size:10px;font-weight:600;color:var(--muted);}
-  .foot .cnt b{color:var(--ink);font-weight:800;}
+  .foot{display:flex;justify-content:space-between;align-items:center;flex:none;margin-top:10px;padding-top:8px;border-top:1px solid #00000012;font-size:10px;font-weight:600;color:var(--muted);gap:8px;}
+  .foot .cnt{flex:none;} .foot .cnt b{color:var(--ink);font-weight:800;}
+  .foot #today{-webkit-app-region:no-drag;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .foot #today b{color:#5d564c;font-weight:700;}
+  .foot .go-r{color:var(--accent);font-weight:800;cursor:pointer;}
 
   [data-size="s"] .datebig{font-size:34px;} [data-size="s"] .dunit{font-size:12px;} [data-size="s"] .foot{display:none;}
   [data-size="m"] .datebig{font-size:42px;} [data-size="m"] .dunit{font-size:15px;}
