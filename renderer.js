@@ -4,8 +4,8 @@
   const CAT = { produce:'농산물', seafood:'해산물', fruit:'과일' };
   const COLOR = ['#3E68A8','#5E9AA6','#E0608F','#4FA873','#36A85C','#129E93',
                  '#F0594B','#E84B62','#D9851F','#DA6A22','#B85436','#3A66A6'];
-  const COUNT = { s:4, m:6, l:7 };
-  const PSIZE = { s:48, m:64, l:84 };
+  const PSIZE = { s:44, m:52, l:64 };
+  const SMALL_CAP = 10;          // small frame shows fewer
   const MAXV = 8, MINV = 0.55, DAMP = 0.992;
   const $ = id => document.getElementById(id);
   const SLUG = window.SLUG || {}, RECIPES = window.RECIPES || {};
@@ -15,6 +15,7 @@
 
   let pool = [], viewMonth = cm(), manual = false, dayKey = '';
   let parts = [], stageW = 0, stageH = 0, raf = null, selected = null, drag = null;
+  let fx0 = 0, fx1 = 0, fy0 = 0, fy1 = 0;  // simulation field (extends beyond visible frame)
 
   function header(m) {
     $('card').style.setProperty('--accent', COLOR[m-1]);
@@ -57,8 +58,8 @@
   document.addEventListener('pointermove', (e) => {
     if (!drag) return;
     const r = stageRect(), p = drag.p;
-    let nx = clamp((e.clientX-r.left)-drag.offx, p.r, r.width-p.r);
-    let ny = clamp((e.clientY-r.top)-drag.offy, p.r, r.height-p.r);
+    let nx = clamp((e.clientX-r.left)-drag.offx, fx0+p.r, fx1-p.r);
+    let ny = clamp((e.clientY-r.top)-drag.offy, fy0+p.r, fy1-p.r);
     drag.vx = nx - p.x; drag.vy = ny - p.y; p.x = nx; p.y = ny;
     if (Math.hypot(e.clientX-drag.sx, e.clientY-drag.sy) > 4) drag.moved = true;
     render();
@@ -78,16 +79,20 @@
     pool = pool.filter(it => SLUG[it.name]);
     header(m);
     const size = PSIZE[$('card').dataset.size] || PSIZE.m;
-    const n = Math.min(COUNT[$('card').dataset.size] || COUNT.m, pool.length);
     const box = $('collage'); box.innerHTML = '';
     const rect = box.getBoundingClientRect(); stageW = rect.width || 280; stageH = rect.height || 160;
-    const chosen = []; const step2 = pool.length / n;
-    for (let k = 0; k < n; k++) chosen.push(pool[Math.floor(k*step2) % pool.length]);
+    // field extends beyond the visible frame so foods swim in and out
+    const mx = stageW * 0.6, my = stageH * 0.6;
+    fx0 = -mx; fx1 = stageW + mx; fy0 = -my; fy1 = stageH + my;
+    // all of the month's foods become particles (small frame caps for space)
+    let chosen = pool.slice();
+    for (let i = chosen.length-1; i>0; i--){ const j=Math.floor(Math.random()*(i+1)); [chosen[i],chosen[j]]=[chosen[j],chosen[i]]; }
+    if ($('card').dataset.size === 's') chosen = chosen.slice(0, SMALL_CAP);
     drag = null;
     parts = chosen.map((it) => {
       const im = imgEl(it, size); box.appendChild(im);
       const r = size * 0.44, ang = rnd(0, Math.PI*2), sp = rnd(0.7, 1.2);
-      return { el:im, it, r, x: rnd(r, Math.max(r, stageW-r)), y: rnd(r, Math.max(r, stageH-r)),
+      return { el:im, it, r, x: rnd(fx0+r, fx1-r), y: rnd(fy0+r, fy1-r),
         vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, rot: rnd(-6,6), vr: rnd(-0.25,0.25), grabbed:false };
     });
     render();
@@ -102,10 +107,10 @@
     for (const p of parts) {
       if (p.grabbed) continue;
       p.x += p.vx; p.y += p.vy; p.rot += p.vr;
-      if (p.x - p.r < 0) { p.x = p.r; p.vx = Math.abs(p.vx); }
-      if (p.x + p.r > stageW) { p.x = stageW - p.r; p.vx = -Math.abs(p.vx); }
-      if (p.y - p.r < 0) { p.y = p.r; p.vy = Math.abs(p.vy); }
-      if (p.y + p.r > stageH) { p.y = stageH - p.r; p.vy = -Math.abs(p.vy); }
+      if (p.x - p.r < fx0) { p.x = fx0 + p.r; p.vx = Math.abs(p.vx); }
+      if (p.x + p.r > fx1) { p.x = fx1 - p.r; p.vx = -Math.abs(p.vx); }
+      if (p.y - p.r < fy0) { p.y = fy0 + p.r; p.vy = Math.abs(p.vy); }
+      if (p.y + p.r > fy1) { p.y = fy1 - p.r; p.vy = -Math.abs(p.vy); }
       p.vx *= DAMP; p.vy *= DAMP;
       let s = Math.hypot(p.vx, p.vy);
       if (s > MAXV) { p.vx *= MAXV/s; p.vy *= MAXV/s; }
@@ -131,18 +136,6 @@
       }
     render();
     raf = requestAnimationFrame(step);
-  }
-
-  function swapOne() {
-    if (parts.length === 0 || pool.length <= parts.length) return;
-    const shown = new Set(parts.map(p => p.it.name));
-    const fresh = pool.filter(it => !shown.has(it.name));
-    if (!fresh.length) return;
-    const p = parts[Math.floor(Math.random()*parts.length)];
-    if (p === selected || p.grabbed) return;
-    const it = fresh[Math.floor(Math.random()*fresh.length)];
-    p.el.style.opacity = '0';
-    setTimeout(() => { p.it = it; p.el.src = 'assets/' + SLUG[it.name] + '.png'; p.el.title = it.name; p.el.style.opacity = '1'; }, 350);
   }
 
   // month slide
@@ -173,5 +166,4 @@
   dayKey = new Date().toDateString();
   build(viewMonth);
   setInterval(tick, 60*1000);
-  setInterval(swapOne, 9000);
 })();
