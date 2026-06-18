@@ -61,16 +61,17 @@
   function select(p){ selected = p; parts.forEach(q => q.el.classList.toggle('sel', q === p)); showName(p.it); }
 
   function burst(p) {
-    const box = $('collage'), k = 5 + Math.floor(Math.random()*4);
+    const box = $('collage'), k = 9 + Math.floor(Math.random()*6);
     for (let i = 0; i < k; i++) {
       const e = document.createElement('span'); e.className = 'pop-emoji';
       e.textContent = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
       e.style.left = p.x + 'px'; e.style.top = (p.y - p.size*0.2) + 'px';
-      const ang = rnd(-Math.PI*0.92, -Math.PI*0.08), dist = 28 + Math.random()*46;
+      const ang = rnd(-Math.PI*0.97, -Math.PI*0.03), dist = 44 + Math.random()*78;
       e.style.setProperty('--dx', (Math.cos(ang)*dist).toFixed(0) + 'px');
-      e.style.setProperty('--dy', (Math.sin(ang)*dist - 18).toFixed(0) + 'px');
-      e.style.animationDelay = (Math.random()*0.1).toFixed(2) + 's';
-      box.appendChild(e); setTimeout(() => e.remove(), 1100);
+      e.style.setProperty('--dy', (Math.sin(ang)*dist - 26).toFixed(0) + 'px');
+      e.style.fontSize = (22 + Math.random()*18).toFixed(0) + 'px';
+      e.style.animationDelay = (Math.random()*0.12).toFixed(2) + 's';
+      box.appendChild(e); setTimeout(() => e.remove(), 1200);
     }
   }
   // click a food (tap, not drag) = toggle eaten
@@ -206,6 +207,23 @@
     setTimeout(() => { if (clone.parentNode) clone.remove(); nw.style.animation = ''; turning = false; }, 840);
   }
   function tick() { const k = new Date().toDateString(); if (k !== dayKey) { dayKey = k; if (!manual) build(cm()); } }
+
+  // 먹은 일기 패널
+  function openDiary() {
+    const data = store[viewMonth] || {}, byDate = {};
+    Object.keys(data).forEach(n => { const d = (data[n] && data[n].d) || '?'; (byDate[d] = byDate[d] || []).push(n); });
+    const days = Object.keys(byDate).sort((a,b) => {
+      const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
+      return (pb[0]-pa[0]) || (pb[1]-pa[1]);
+    });
+    $('dtitle').textContent = viewMonth + '월 먹은 일기';
+    $('dlist').innerHTML = days.length
+      ? days.map(d => '<div class="dday"><b>' + d + '</b><span>' + byDate[d].join(' · ') + '</span></div>').join('')
+      : '<div class="dempty">아직 기록이 없어요.<br>음식을 톡 클릭해서 도장을 찍어보세요 😋</div>';
+    $('diary').hidden = false;
+  }
+  $('prog').onclick = openDiary;
+  $('dclose').onclick = () => { $('diary').hidden = true; };
 
   $('prev').onclick = () => setMonth(viewMonth - 1, 'prev');
   $('next').onclick = () => setMonth(viewMonth + 1, 'next');
