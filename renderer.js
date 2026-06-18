@@ -52,11 +52,21 @@
   function deselect(){ selected = null; parts.forEach(p => p.el.classList.remove('sel')); revertName(); }
   function select(p){ selected = p; parts.forEach(q => q.el.classList.toggle('sel', q === p)); showName(p.it); }
 
+  function popEmoji(p) {
+    const e = document.createElement('span'); e.className = 'pop-emoji'; e.textContent = '😋';
+    e.style.left = p.x + 'px'; e.style.top = (p.y - p.size*0.35) + 'px';
+    $('collage').appendChild(e); setTimeout(() => e.remove(), 950);
+  }
   $('eatbtn').onclick = () => {
     if (!shownIt) return;
     toggleEaten(viewMonth, shownIt.name);
     const eaten = isEaten(viewMonth, shownIt.name);
-    parts.forEach(p => { if (p.it.name === shownIt.name) { p.eaten = eaten; p.el.classList.toggle('eaten', eaten); } });
+    parts.forEach(p => {
+      if (p.it.name === shownIt.name) {
+        p.eaten = eaten; p.el.classList.toggle('eaten', eaten);
+        if (eaten) { p.el.classList.add('pop'); setTimeout(() => p.el.classList.remove('pop'), 460); popEmoji(p); }
+      }
+    });
     showName(shownIt); updateProg();
   };
   $('namerec').onclick = () => { if (shownIt && window.api) window.api.openRecipe(shownIt.name); };
@@ -66,8 +76,8 @@
   function makePim(it, size) {
     const w = document.createElement('div'); w.className = 'pim'; w.title = it.name;
     const im = document.createElement('img'); im.className = 'pim-img'; im.src = 'assets/' + SLUG[it.name] + '.png'; im.style.width = size + 'px';
-    const bg = document.createElement('span'); bg.className = 'badge'; bg.textContent = '✓';
-    w.appendChild(im); w.appendChild(bg);
+    const st = document.createElement('span'); st.className = 'stamp'; st.textContent = '맛봄';
+    w.appendChild(im); w.appendChild(st);
     w.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       const p = parts.find(q => q.el === w); if (!p) return;
