@@ -9,11 +9,22 @@
   :root{--paper:#FBFAF7;--line:#00000012;--ink:#26241F;--muted:#9c968b;--accent:#E2722B;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;}
   html,body{background:transparent;overflow:hidden;font-family:"Pretendard",-apple-system,sans-serif;}
-  #card{margin:44px;height:calc(100vh - 88px);border-radius:17px;background:var(--paper);
+  #card{margin:44px;height:calc(100vh - 88px);border-radius:14px;background:var(--paper);
     overflow:hidden;position:relative;-webkit-app-region:drag;
     box-shadow:0 2px 5px #0000000d, 0 8px 16px #00000012, 0 14px 26px #00000016, inset 0 0 0 1px var(--line);
     color:var(--ink);padding:0;perspective:1100px;}
-  .page{position:relative;height:100%;padding:14px 16px;display:flex;flex-direction:column;
+  /* riso paper grain over everything (subtle) */
+  #card::after{content:"";position:absolute;inset:0;z-index:25;pointer-events:none;opacity:.45;
+    mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");}
+  /* spiral binding at the top — stays fixed while pages tear/slide */
+  .binding{position:absolute;top:0;left:0;right:0;height:24px;z-index:30;
+    display:flex;justify-content:center;align-items:center;gap:10px;pointer-events:none;}
+  .binding::before{content:"";position:absolute;top:7px;left:34px;right:34px;height:2px;
+    background:#0000000f;border-radius:2px;}
+  .binding .ring{width:8px;height:11px;border-radius:50%;border:2px solid #00000026;
+    background:var(--paper);margin-top:-5px;}
+  .page{position:relative;height:100%;padding:28px 16px 14px;display:flex;flex-direction:column;
     background:var(--paper);z-index:1;}
 
   /* ---- motions ---- */
@@ -95,6 +106,10 @@
 </head>
 <body>
   <div id="card" data-size="m">
+   <div class="binding">
+     <i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i>
+     <i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i>
+   </div>
    <div class="page" id="page">
     <div class="top">
       <span class="navwrap"><span class="nav" id="prev">‹</span><span class="mon" id="mon">6월 · JUNE</span><span class="nav" id="next">›</span></span>
