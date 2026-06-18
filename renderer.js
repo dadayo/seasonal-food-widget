@@ -157,9 +157,10 @@
     viewMonth = ((m-1+12)%12)+1; manual = (viewMonth !== cm());
     build(viewMonth);                              // repopulates #collage + updates title/date in place
     const nw = $('collage');
-    clone.style.animation = (dir === 'next' ? 'clOutL' : 'clOutR') + ' .56s cubic-bezier(.5,0,.35,1) forwards';
-    nw.style.animation = (dir === 'next' ? 'clInR' : 'clInL') + ' .56s cubic-bezier(.5,0,.35,1)';
-    setTimeout(() => { if (clone.parentNode) clone.remove(); nw.style.animation = ''; turning = false; }, 580);
+    const EASE = ' .8s cubic-bezier(.22,1,.36,1)';
+    clone.style.animation = (dir === 'next' ? 'clOutL' : 'clOutR') + EASE + ' forwards';
+    nw.style.animation = (dir === 'next' ? 'clInR' : 'clInL') + EASE;
+    setTimeout(() => { if (clone.parentNode) clone.remove(); nw.style.animation = ''; turning = false; }, 840);
   }
   function tick() { const k = new Date().toDateString(); if (k !== dayKey) { dayKey = k; if (!manual) build(cm()); } }
 
