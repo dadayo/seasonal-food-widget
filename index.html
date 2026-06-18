@@ -6,7 +6,7 @@
 <title>제철 달력</title>
 <style>
   @font-face{font-family:"Pretendard";src:url("fonts/PretendardVariable.woff2") format("woff2-variations");font-weight:100 900;font-display:swap;}
-  :root{--paper:#F4EEDF;--line:#00000012;--ink:#2c2a24;--muted:#9a9384;--accent:#E2722B;}
+  :root{--paper:#FBFAF6;--line:#00000010;--ink:#2c2a24;--muted:#a39d90;--accent:#E2722B;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;}
   html,body{background:transparent;overflow:hidden;font-family:"Pretendard",-apple-system,sans-serif;}
 
@@ -17,7 +17,7 @@
     padding:0;perspective:1100px;
     -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' preserveAspectRatio='none'><filter id='r'><feTurbulence type='fractalNoise' baseFrequency='0.018' numOctaves='2' seed='7' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='7' xChannelSelector='R' yChannelSelector='G'/></filter><rect x='5' y='5' width='310' height='310' rx='13' ry='13' fill='black' filter='url(%23r)'/></svg>") center/100% 100% no-repeat;}
   /* riso grain */
-  #card::after{content:"";position:absolute;inset:0;z-index:25;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+  #card::after{content:"";position:absolute;inset:0;z-index:25;pointer-events:none;opacity:.32;mix-blend-mode:multiply;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");}
   /* spiral binding */
   .binding{position:absolute;top:0;left:0;right:0;height:24px;z-index:30;display:flex;justify-content:center;align-items:center;gap:10px;pointer-events:none;}
@@ -48,7 +48,12 @@
   /* collage of the month's seasonal foods, printed in one ink (duotone) */
   .stage{flex:1;position:relative;margin:4px 0;overflow:hidden;}
   .collage{position:absolute;inset:0;}
-  .collage img{position:absolute;object-fit:contain;filter:url(#duo);-webkit-app-region:no-drag;cursor:pointer;}
+  .collage .slot{position:absolute;}
+  .collage img{width:100%;display:block;object-fit:contain;-webkit-app-region:no-drag;cursor:pointer;
+    filter:drop-shadow(0 3px 5px #0000001f);
+    animation:floaty var(--dur,4s) var(--del,0s) infinite alternate ease-in-out;}
+  .collage img:hover{filter:drop-shadow(0 6px 10px #00000036);}
+  @keyframes floaty{from{transform:translateY(-3px) rotate(-1.6deg)}to{transform:translateY(4px) rotate(1.6deg)}}
 
   .daterow{display:flex;align-items:flex-end;gap:8px;flex:none;}
   .datebig{font-weight:900;color:var(--accent);letter-spacing:-2px;line-height:.85;}
@@ -65,16 +70,6 @@
 </style>
 </head>
 <body>
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <filter id="duo" color-interpolation-filters="sRGB">
-      <feColorMatrix type="saturate" values="0"/>
-      <feComponentTransfer>
-        <feFuncR id="duoR" type="table" tableValues="0.88 0.97"/>
-        <feFuncG id="duoG" type="table" tableValues="0.45 0.93"/>
-        <feFuncB id="duoB" type="table" tableValues="0.17 0.87"/>
-      </feComponentTransfer>
-    </filter>
-  </svg>
   <div class="shadowwrap">
    <div id="card" data-size="m">
     <div class="binding">

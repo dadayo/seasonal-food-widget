@@ -4,30 +4,19 @@
   const CAT = { produce:'농산물', seafood:'해산물', fruit:'과일' };
   const COLOR = ['#3E68A8','#5E9AA6','#E0608F','#4FA873','#36A85C','#129E93',
                  '#F0594B','#E84B62','#D9851F','#DA6A22','#B85436','#3A66A6'];
-  // collage slots (percent box): left, top, size%, rotation
-  const POS = [
-    {l:-2,t:8,s:38,r:-9},{l:33,t:0,s:42,r:7},{l:67,t:6,s:40,r:-5},
-    {l:14,t:30,s:46,r:4},{l:52,t:30,s:48,r:-7},{l:-4,t:54,s:40,r:8},
-    {l:35,t:58,s:44,r:-4},{l:70,t:46,s:42,r:11},{l:60,t:74,s:38,r:-9},
-    {l:22,t:74,s:36,r:6}
-  ];
+  // collage slots per size (percent box): left, top, size%, base rotation
+  const POS_BY = {
+    s: [ {l:5,t:12,s:30,r:-6},{l:37,t:4,s:34,r:5},{l:68,t:16,s:30,r:-5} ],
+    m: [ {l:4,t:5,s:27,r:-5},{l:38,t:1,s:30,r:5},{l:71,t:7,s:26,r:-4},
+         {l:7,t:50,s:28,r:4},{l:40,t:52,s:30,r:-6},{l:70,t:48,s:26,r:7} ],
+    l: [ {l:2,t:5,s:30,r:-6},{l:37,t:0,s:33,r:5},{l:71,t:7,s:29,r:-4},
+         {l:4,t:50,s:31,r:4},{l:38,t:53,s:33,r:-6},{l:70,t:49,s:29,r:7} ]
+  };
   const $ = id => document.getElementById(id);
   const SLUG = window.SLUG || {}, RECIPES = window.RECIPES || {};
   const cm = () => new Date().getMonth() + 1;
-  const PAPER = [244,238,223];
 
   let pool = [], viewMonth = cm(), manual = false, dayKey = '';
-
-  function hex(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]; }
-  function setDuo(accent) {
-    const d = hex(accent);
-    // light end = pale tint of accent (10% accent, 90% white) → monochrome ink look
-    const light = d.map(v => Math.round(v*0.12 + 255*0.88));
-    const f = (lo,hi) => (lo/255).toFixed(3) + ' ' + (hi/255).toFixed(3);
-    $('duoR').setAttribute('tableValues', f(d[0], light[0]));
-    $('duoG').setAttribute('tableValues', f(d[1], light[1]));
-    $('duoB').setAttribute('tableValues', f(d[2], light[2]));
-  }
 
   function pickFoods(n) {
     const N = pool.length, out = [];
@@ -42,7 +31,6 @@
     for (const c of ['produce','seafood','fruit'])
       data[c].forEach(([name,emoji]) => pool.push({ cat:c, name, emoji }));
     $('card').style.setProperty('--accent', COLOR[m-1]);
-    setDuo(COLOR[m-1]);
     $('mon').textContent = m + '월 · ' + EN[m-1];
     $('cnt').innerHTML = '제철 <b>' + pool.length + '</b>종';
     const d = new Date();
@@ -53,24 +41,24 @@
       $('datebig').textContent = m; $('dunit').textContent = '월';
       $('weekday').textContent = '제철 미리보기'; $('today').textContent = '제철 달력';
     }
-    // collage
+    // collage (count/layout per current size)
+    const POS = POS_BY[$('card').dataset.size] || POS_BY.m;
     const box = $('collage'); box.innerHTML = '';
     const foods = pickFoods(POS.length);
     foods.forEach((it, i) => {
       const slug = SLUG[it.name]; if (!slug) return;
       const p = POS[i];
+      const slot = document.createElement('div'); slot.className = 'slot';
+      slot.style.left = p.l + '%'; slot.style.top = p.t + '%'; slot.style.width = p.s + '%';
+      slot.style.transform = 'rotate(' + p.r + 'deg)';
       const im = document.createElement('img');
-      im.src = 'assets/' + slug + '.png';
-      im.style.left = p.l + '%'; im.style.top = p.t + '%';
-      im.style.width = p.s + '%';
-      im.style.transform = 'rotate(' + p.r + 'deg)';
-      im.title = it.name;
-      im.onmouseenter = () => { $('caption').firstChild.textContent = it.name;
-        $('capsub').textContent = CAT[it.cat]; };
-      im.onmouseleave = () => { $('caption').firstChild.textContent = '이달의 제철';
-        $('capsub').textContent = ''; };
+      im.src = 'assets/' + slug + '.png'; im.title = it.name;
+      im.style.setProperty('--dur', (3.4 + Math.random()*2.8).toFixed(2) + 's');
+      im.style.setProperty('--del', (-Math.random()*3).toFixed(2) + 's');
+      im.onmouseenter = () => { $('caption').firstChild.textContent = it.name; $('capsub').textContent = CAT[it.cat]; };
+      im.onmouseleave = () => { $('caption').firstChild.textContent = '이달의 제철'; $('capsub').textContent = ''; };
       im.onclick = () => window.api && window.api.openRecipe(it.name);
-      box.appendChild(im);
+      slot.appendChild(im); box.appendChild(slot);
     });
   }
 
@@ -106,8 +94,8 @@
   $('next').onclick = () => setMonth(viewMonth + 1, 'next');
 
   if (window.api) {
-    window.api.getSize().then(s => { if (s) $('card').dataset.size = s; }).catch(()=>{});
-    window.api.onSize(s => { $('card').dataset.size = s; });
+    window.api.getSize().then(s => { if (s) { $('card').dataset.size = s; build(viewMonth); } }).catch(()=>{});
+    window.api.onSize(s => { $('card').dataset.size = s; build(viewMonth); });
   }
 
   dayKey = new Date().toDateString();
