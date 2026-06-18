@@ -6,35 +6,29 @@
 <title>제철 달력</title>
 <style>
   @font-face{font-family:"Pretendard";src:url("fonts/PretendardVariable.woff2") format("woff2-variations");font-weight:100 900;font-display:swap;}
-  :root{--paper:#FBFAF7;--line:#00000012;--ink:#26241F;--muted:#9c968b;--accent:#E2722B;}
+  :root{--paper:#F4EEDF;--line:#00000012;--ink:#2c2a24;--muted:#9a9384;--accent:#E2722B;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;}
   html,body{background:transparent;overflow:hidden;font-family:"Pretendard",-apple-system,sans-serif;}
-  #card{margin:44px;height:calc(100vh - 88px);border-radius:14px;background:var(--paper);
-    overflow:hidden;position:relative;-webkit-app-region:drag;
-    box-shadow:0 2px 5px #0000000d, 0 8px 16px #00000012, 0 14px 26px #00000016, inset 0 0 0 1px var(--line);
-    color:var(--ink);padding:0;perspective:1100px;}
-  /* riso paper grain over everything (subtle) */
-  #card::after{content:"";position:absolute;inset:0;z-index:25;pointer-events:none;opacity:.45;
-    mix-blend-mode:multiply;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");}
-  /* spiral binding at the top — stays fixed while pages tear/slide */
-  .binding{position:absolute;top:0;left:0;right:0;height:24px;z-index:30;
-    display:flex;justify-content:center;align-items:center;gap:10px;pointer-events:none;}
-  .binding::before{content:"";position:absolute;top:7px;left:34px;right:34px;height:2px;
-    background:#0000000f;border-radius:2px;}
-  .binding .ring{width:8px;height:11px;border-radius:50%;border:2px solid #00000026;
-    background:var(--paper);margin-top:-5px;}
-  .page{position:relative;height:100%;padding:28px 16px 14px;display:flex;flex-direction:column;
-    background:var(--paper);z-index:1;}
 
-  /* ---- motions ---- */
-  .pageturn{position:absolute;inset:0;z-index:20;transform-origin:0 0;backface-visibility:hidden;will-change:transform,opacity;}
+  /* drop-shadow on wrapper so it traces the deckle (masked) card shape */
+  .shadowwrap{margin:42px;height:calc(100vh - 84px);position:relative;-webkit-app-region:drag;
+    filter:drop-shadow(0 2px 5px #00000012) drop-shadow(0 9px 16px #0000001c) drop-shadow(0 15px 24px #00000012);}
+  #card{height:100%;background:var(--paper);overflow:hidden;position:relative;color:var(--ink);
+    padding:0;perspective:1100px;
+    -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' preserveAspectRatio='none'><filter id='r'><feTurbulence type='fractalNoise' baseFrequency='0.018' numOctaves='2' seed='7' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='7' xChannelSelector='R' yChannelSelector='G'/></filter><rect x='5' y='5' width='310' height='310' rx='13' ry='13' fill='black' filter='url(%23r)'/></svg>") center/100% 100% no-repeat;}
+  /* riso grain */
+  #card::after{content:"";position:absolute;inset:0;z-index:25;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");}
+  /* spiral binding */
+  .binding{position:absolute;top:0;left:0;right:0;height:24px;z-index:30;display:flex;justify-content:center;align-items:center;gap:10px;pointer-events:none;}
+  .binding::before{content:"";position:absolute;top:7px;left:34px;right:34px;height:2px;background:#0000000f;border-radius:2px;}
+  .binding .ring{width:8px;height:11px;border-radius:50%;border:2px solid #0000002b;background:var(--paper);margin-top:-5px;}
+
+  .page{position:relative;height:100%;padding:28px 18px 14px;display:flex;flex-direction:column;background:var(--paper);z-index:1;}
+
+  /* motions */
+  .pageturn{position:absolute;inset:0;z-index:20;backface-visibility:hidden;will-change:transform,opacity;}
   .pageturn .page{box-shadow:0 14px 26px #0000002b;}
-  .pageturn::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#0000 30%,#00000033);opacity:0;}
-  .pageturn.go{animation:teardiag 1.05s cubic-bezier(.33,0,.25,1) forwards;}
-  .pageturn.go::after{animation:shade 1.05s ease forwards;}
-  @keyframes teardiag{0%{transform:rotateZ(0) rotateX(0)}100%{transform:rotateZ(-13deg) rotateX(-118deg);opacity:.1}}
-  @keyframes shade{0%{opacity:0}100%{opacity:.55}}
   .pageturn.slideL{animation:slideL .62s cubic-bezier(.5,0,.35,1) forwards;}
   .pageturn.slideR{animation:slideR .62s cubic-bezier(.5,0,.35,1) forwards;}
   @keyframes slideL{to{transform:translateX(-107%);opacity:.5}}
@@ -44,90 +38,61 @@
   @keyframes inR{from{transform:translateX(38%);opacity:.4}to{transform:none;opacity:1}}
   @keyframes inL{from{transform:translateX(-38%);opacity:.4}to{transform:none;opacity:1}}
 
-  /* ---- header ---- */
   .top{display:flex;justify-content:space-between;align-items:center;flex:none;z-index:2;}
   .navwrap{display:flex;align-items:center;gap:5px;}
-  .mon{font-weight:700;color:var(--accent);letter-spacing:.2px;font-size:12px;}
-  .nav{font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;line-height:1;
-    -webkit-app-region:no-drag;padding:0 1px;opacity:.6;transition:opacity .12s,color .12s;}
+  .mon{font-weight:800;color:var(--accent);letter-spacing:.2px;font-size:12px;}
+  .nav{font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;line-height:1;-webkit-app-region:no-drag;padding:0 1px;opacity:.6;transition:opacity .12s,color .12s;}
   .nav:hover{opacity:1;color:var(--accent);}
   .weekday{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;}
 
-  /* ---- hero: BIG date + food illustration ---- */
-  .stage{flex:1;position:relative;display:flex;align-items:center;gap:6px;}
-  .cal{display:flex;align-items:flex-start;line-height:.86;flex:none;}
-  .datebig{font-weight:900;color:var(--accent);letter-spacing:-4px;}
-  .dunit{font-weight:800;color:var(--accent);opacity:.85;align-self:flex-end;margin-bottom:6px;}
-  .foodbox{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;}
-  .imgwrap{position:relative;display:flex;align-items:center;justify-content:center;-webkit-app-region:no-drag;cursor:pointer;}
-  .imgwrap::before{content:"";position:absolute;width:122%;height:122%;border-radius:50%;
-    background:radial-gradient(closest-side, color-mix(in srgb, var(--accent) 15%, transparent), #0000 72%);z-index:-1;}
-  .fimg{object-fit:contain;filter:drop-shadow(0 4px 7px #00000026);transition:transform .3s ease;}
-  .emoji{line-height:1;}
-  .finfo{margin-top:3px;}
-  .cat{font-size:9.5px;font-weight:800;letter-spacing:.5px;color:var(--accent);}
-  .fname{font-weight:800;letter-spacing:-.5px;line-height:1.02;color:var(--ink);word-break:keep-all;}
+  /* collage of the month's seasonal foods, printed in one ink (duotone) */
+  .stage{flex:1;position:relative;margin:4px 0;overflow:hidden;}
+  .collage{position:absolute;inset:0;}
+  .collage img{position:absolute;object-fit:contain;filter:url(#duo);-webkit-app-region:no-drag;cursor:pointer;}
 
-  .recipe{margin-top:7px;font-size:11px;color:var(--muted);font-weight:600;text-align:center;
-    -webkit-app-region:no-drag;cursor:pointer;line-height:1.3;flex:none;}
-  .recipe b{color:#5d564c;font-weight:700;}
-  .recipe .go-r{color:var(--accent);font-weight:800;white-space:nowrap;}
+  .daterow{display:flex;align-items:flex-end;gap:8px;flex:none;}
+  .datebig{font-weight:900;color:var(--accent);letter-spacing:-2px;line-height:.85;}
+  .dunit{font-weight:800;color:var(--accent);opacity:.85;margin-bottom:3px;}
+  .caption{margin-left:auto;text-align:right;font-size:11px;font-weight:700;color:var(--ink);align-self:flex-end;margin-bottom:3px;}
+  .caption small{display:block;font-size:9px;color:var(--muted);font-weight:600;}
 
-  .peek{display:none;flex-wrap:wrap;gap:5px;margin-top:11px;padding-top:11px;flex:none;
-    border-top:1px solid #00000010;justify-content:center;}
-  .peek .p{width:27px;height:27px;border-radius:7px;background:#00000005;display:flex;
-    align-items:center;justify-content:center;-webkit-app-region:no-drag;cursor:pointer;
-    opacity:.78;transition:transform .12s,opacity .12s;}
-  .peek .p:hover{transform:translateY(-2px);opacity:1;}
-  .peek .p img{max-width:20px;max-height:20px;object-fit:contain;}
-  .peek .p span{font-size:14px;}
-  .peek .p.on{opacity:1;background:#fff;box-shadow:0 0 0 2px var(--accent);transform:scale(1.04);}
-
-  .foot{display:flex;justify-content:space-between;align-items:center;flex:none;margin-top:10px;
-    padding-top:9px;border-top:1px solid #00000010;font-size:10px;font-weight:600;color:var(--muted);}
+  .foot{display:flex;justify-content:space-between;align-items:center;flex:none;margin-top:10px;padding-top:8px;border-top:1px solid #00000012;font-size:10px;font-weight:600;color:var(--muted);}
   .foot .cnt b{color:var(--ink);font-weight:800;}
 
-  /* ---- sizes ---- */
-  [data-size="s"] .datebig{font-size:62px;} [data-size="s"] .dunit{font-size:16px;}
-  [data-size="s"] .fimg,[data-size="s"] .imgwrap{max-width:56px;max-height:56px;width:56px;height:56px;}
-  [data-size="s"] .emoji{font-size:42px;} [data-size="s"] .fname{font-size:15px;}
-  [data-size="s"] .recipe,[data-size="s"] .foot{display:none;}
-
-  [data-size="m"] .datebig{font-size:88px;} [data-size="m"] .dunit{font-size:20px;}
-  [data-size="m"] .fimg,[data-size="m"] .imgwrap{max-width:88px;max-height:88px;width:88px;height:88px;}
-  [data-size="m"] .emoji{font-size:60px;} [data-size="m"] .fname{font-size:21px;}
-
-  [data-size="l"] .stage{flex-direction:column;justify-content:center;gap:2px;}
-  [data-size="l"] .datebig{font-size:118px;} [data-size="l"] .dunit{font-size:26px;margin-bottom:12px;}
-  [data-size="l"] .fimg,[data-size="l"] .imgwrap{max-width:140px;max-height:140px;width:140px;height:140px;}
-  [data-size="l"] .emoji{font-size:104px;} [data-size="l"] .fname{font-size:30px;}
-  [data-size="l"] .peek{display:flex;}
+  [data-size="s"] .datebig{font-size:34px;} [data-size="s"] .dunit{font-size:12px;} [data-size="s"] .foot{display:none;}
+  [data-size="m"] .datebig{font-size:42px;} [data-size="m"] .dunit{font-size:15px;}
+  [data-size="l"] .datebig{font-size:54px;} [data-size="l"] .dunit{font-size:18px;}
 </style>
 </head>
 <body>
-  <div id="card" data-size="m">
-   <div class="binding">
-     <i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i>
-     <i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i>
-   </div>
-   <div class="page" id="page">
-    <div class="top">
-      <span class="navwrap"><span class="nav" id="prev">‹</span><span class="mon" id="mon">6월 · JUNE</span><span class="nav" id="next">›</span></span>
-      <span class="weekday" id="weekday">수요일</span>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="duo" color-interpolation-filters="sRGB">
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncR id="duoR" type="table" tableValues="0.88 0.97"/>
+        <feFuncG id="duoG" type="table" tableValues="0.45 0.93"/>
+        <feFuncB id="duoB" type="table" tableValues="0.17 0.87"/>
+      </feComponentTransfer>
+    </filter>
+  </svg>
+  <div class="shadowwrap">
+   <div id="card" data-size="m">
+    <div class="binding">
+      <i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i>
+      <i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i>
     </div>
-    <div class="stage">
-      <div class="cal"><span class="datebig" id="datebig">18</span><span class="dunit" id="dunit">일</span></div>
-      <div class="foodbox">
-        <div class="imgwrap" id="imgwrap">
-          <img class="fimg" id="fimg" alt="" style="display:none">
-          <span class="emoji" id="femoji">🍽️</span>
-        </div>
-        <div class="finfo"><span class="cat" id="fcat">제철</span><div class="fname" id="fname">—</div></div>
+    <div class="page" id="page">
+      <div class="top">
+        <span class="navwrap"><span class="nav" id="prev">‹</span><span class="mon" id="mon">6월 · JUNE</span><span class="nav" id="next">›</span></span>
+        <span class="weekday" id="weekday">목요일</span>
       </div>
+      <div class="stage"><div class="collage" id="collage"></div></div>
+      <div class="daterow">
+        <span class="datebig" id="datebig">18</span><span class="dunit" id="dunit">일</span>
+        <span class="caption" id="caption">이달의 제철<small id="capsub"></small></span>
+      </div>
+      <div class="foot"><span id="today">제철 달력</span><span class="cnt" id="cnt"></span></div>
     </div>
-    <div class="recipe" id="recipe"></div>
-    <div class="peek" id="peek"></div>
-    <div class="foot"><span id="today">오늘의 제철</span><span class="cnt" id="cnt"></span></div>
    </div>
   </div>
   <script src="data.js"></script>
