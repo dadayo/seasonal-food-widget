@@ -15,6 +15,7 @@
     filter:drop-shadow(0 2px 5px #00000012) drop-shadow(0 9px 16px #0000001c) drop-shadow(0 15px 24px #00000012);}
   #card{height:100%;background:var(--paper);overflow:hidden;position:relative;color:var(--ink);
     padding:0;perspective:1100px;
+    box-shadow:inset 0 0 0 10px var(--accent), inset 0 0 0 13px #fffffff2, inset 0 0 0 14px #00000014;
     -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320' preserveAspectRatio='none'><filter id='r'><feTurbulence type='fractalNoise' baseFrequency='0.018' numOctaves='2' seed='7' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='7' xChannelSelector='R' yChannelSelector='G'/></filter><rect x='5' y='5' width='310' height='310' rx='13' ry='13' fill='black' filter='url(%23r)'/></svg>") center/100% 100% no-repeat;}
   /* riso grain */
   #card::after{content:"";position:absolute;inset:0;z-index:25;pointer-events:none;opacity:.32;mix-blend-mode:multiply;
@@ -24,7 +25,7 @@
   .binding::before{content:"";position:absolute;top:7px;left:34px;right:34px;height:2px;background:#0000000f;border-radius:2px;}
   .binding .ring{width:8px;height:11px;border-radius:50%;border:2px solid #0000002b;background:var(--paper);margin-top:-5px;}
 
-  .page{position:relative;height:100%;padding:28px 18px 14px;display:flex;flex-direction:column;background:var(--paper);z-index:1;}
+  .page{position:relative;height:100%;padding:18px 20px 15px;display:flex;flex-direction:column;background:var(--paper);z-index:1;}
 
   /* motions */
   .pageturn{position:absolute;inset:0;z-index:20;backface-visibility:hidden;will-change:transform,opacity;}
@@ -86,10 +87,6 @@
 <body>
   <div class="shadowwrap">
    <div id="card" data-size="m">
-    <div class="binding">
-      <i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i>
-      <i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i><i class="ring"></i>
-    </div>
     <div class="page" id="page">
       <div class="top">
         <span class="nav" id="prev">‹</span>

@@ -6,7 +6,7 @@
                  '#F0594B','#E84B62','#D9851F','#DA6A22','#B85436','#3A66A6'];
   const PSIZE = { s:50, m:66, l:82 };
   const SMALL_CAP = 10;          // small frame shows fewer
-  const MAXV = 8, MINV = 0.55, DAMP = 0.992;
+  const MAXV = 5, MINV = 0.14, DAMP = 0.99;   // languid drift
   const $ = id => document.getElementById(id);
   const SLUG = window.SLUG || {}, RECIPES = window.RECIPES || {};
   const cm = () => new Date().getMonth() + 1;
@@ -14,7 +14,7 @@
   const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 
   let pool = [], viewMonth = cm(), manual = false, dayKey = '';
-  let parts = [], stageW = 0, stageH = 0, raf = null, selected = null, drag = null;
+  let parts = [], stageW = 0, stageH = 0, raf = null, selected = null, drag = null, shownIt = null;
   let fx0 = 0, fx1 = 0, fy0 = 0, fy1 = 0;  // simulation field (extends beyond visible frame)
 
   function header(m) {
@@ -26,22 +26,23 @@
     else { $('datebig').textContent = m; $('dunit').textContent = '월'; $('weekday').textContent = '미리보기'; }
     deselect();
   }
-  // big-name display (separate spot) — shows on hover, sticks with recipe on click
-  function showName(it, withRecipe) {
+  // name + recipe display (separate spot) — shows on hover AND click
+  function showName(it) {
+    shownIt = it;
     $('namebig').textContent = it.name; $('namebig').classList.add('active');
-    if (withRecipe) { const r = RECIPES[it.name];
-      $('namerec').innerHTML = r ? (r.join(' · ') + ' <span class="go-r">레시피 →</span>') : '<span class="go-r">레시피 검색 →</span>'; }
-    else $('namerec').textContent = '';
+    const r = RECIPES[it.name];
+    $('namerec').innerHTML = r ? (r.join(' · ') + ' <span class="go-r">레시피 →</span>') : '<span class="go-r">레시피 검색 →</span>';
   }
   function revertName() {
-    if (selected) { showName(selected.it, true); return; }
+    if (selected) { showName(selected.it); return; }
+    shownIt = null;
     $('namebig').textContent = '이달의 제철 ' + pool.length + '종'; $('namebig').classList.remove('active');
     $('namerec').textContent = '';
   }
   function deselect() { selected = null; parts.forEach(p => p.el.classList.remove('sel')); revertName(); }
   function select(p) {
     selected = p; parts.forEach(q => q.el.classList.toggle('sel', q === p));
-    showName(p.it, true);
+    showName(p.it);
   }
 
   function stageRect(){ return $('collage').getBoundingClientRect(); }
@@ -56,7 +57,7 @@
       drag = { p, offx:(e.clientX-r.left)-p.x, offy:(e.clientY-r.top)-p.y, vx:0, vy:0, sx:e.clientX, sy:e.clientY, moved:false };
       p.grabbed = true; im.style.cursor = 'grabbing';
     });
-    im.addEventListener('pointerenter', () => { const p = parts.find(q => q.el === im); if (p && p !== selected) showName(p.it, false); });
+    im.addEventListener('pointerenter', () => { const p = parts.find(q => q.el === im); if (p) showName(p.it); });
     im.addEventListener('pointerleave', () => revertName());
     return im;
   }
@@ -97,9 +98,9 @@
     drag = null;
     parts = chosen.map((it) => {
       const im = makePim(it, size); box.appendChild(im);
-      const r = size * 0.44, ang = rnd(0, Math.PI*2), sp = rnd(0.7, 1.2);
+      const r = size * 0.44, ang = rnd(0, Math.PI*2), sp = rnd(0.12, 0.26);
       return { el:im, size, it, r, x: rnd(fx0+r, fx1-r), y: rnd(fy0+r, fy1-r),
-        vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, rot: rnd(-6,6), vr: rnd(-0.25,0.25), grabbed:false };
+        vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, rot: rnd(-6,6), vr: rnd(-0.07,0.07), grabbed:false };
     });
     render();
     if (!raf) raf = requestAnimationFrame(step);
@@ -162,7 +163,7 @@
 
   $('prev').onclick = () => setMonth(viewMonth - 1, 'prev');
   $('next').onclick = () => setMonth(viewMonth + 1, 'next');
-  $('namerec').onclick = () => { if (selected && window.api) window.api.openRecipe(selected.it.name); };
+  $('namerec').onclick = () => { if (shownIt && window.api) window.api.openRecipe(shownIt.name); };
   document.querySelector('.stage').addEventListener('pointerdown', (e) => { if (!e.target.closest('.pim')) deselect(); });
 
   if (window.api) {
