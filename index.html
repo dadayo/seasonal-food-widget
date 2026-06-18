@@ -56,6 +56,12 @@
   /* collage of the month's seasonal foods, printed in one ink (duotone) */
   .stage{flex:1;position:relative;margin:4px 0;overflow:hidden;}
   .collage{position:absolute;inset:0;}
+  /* month change: only the foods inside the frame slide */
+  .cl-ov{position:absolute;inset:0;z-index:6;pointer-events:none;}
+  @keyframes clOutL{to{transform:translateX(-112%);opacity:.25}}
+  @keyframes clOutR{to{transform:translateX(112%);opacity:.25}}
+  @keyframes clInR{from{transform:translateX(58%);opacity:.25}to{transform:translateX(0);opacity:1}}
+  @keyframes clInL{from{transform:translateX(-58%);opacity:.25}to{transform:translateX(0);opacity:1}}
   .collage .pim{position:absolute;top:0;left:0;-webkit-app-region:no-drag;cursor:grab;touch-action:none;
     filter:drop-shadow(0 3px 5px #0000001f);will-change:transform;transition:opacity .35s ease,filter .15s ease;z-index:1;}
   .collage .pim:active{cursor:grabbing;}

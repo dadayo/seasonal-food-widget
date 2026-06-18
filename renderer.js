@@ -146,19 +146,21 @@
     raf = requestAnimationFrame(step);
   }
 
-  // month slide
+  // month change: frame & title stay; only the foods inside slide out/in
   let turning = false;
-  function turn(update, dir) {
-    if (turning) { update(); return; }
-    turning = true;
-    const card = $('card'), page = $('page');
-    const ov = document.createElement('div'); ov.className = 'pageturn'; ov.appendChild(page.cloneNode(true)); card.appendChild(ov);
-    update();
-    ov.classList.add(dir === 'next' ? 'slideL' : 'slideR'); page.classList.add(dir === 'next' ? 'inR' : 'inL');
-    setTimeout(() => page.classList.remove('inR','inL'), 640);
-    setTimeout(() => { if (ov.parentNode) ov.remove(); turning = false; }, 700);
+  function setMonth(m, dir) {
+    if (turning) return; turning = true; dir = dir || 'next';
+    const stage = document.querySelector('.stage');
+    const clone = $('collage').cloneNode(true);   // snapshot of current foods
+    clone.removeAttribute('id'); clone.classList.add('cl-ov');
+    stage.appendChild(clone);
+    viewMonth = ((m-1+12)%12)+1; manual = (viewMonth !== cm());
+    build(viewMonth);                              // repopulates #collage + updates title/date in place
+    const nw = $('collage');
+    clone.style.animation = (dir === 'next' ? 'clOutL' : 'clOutR') + ' .56s cubic-bezier(.5,0,.35,1) forwards';
+    nw.style.animation = (dir === 'next' ? 'clInR' : 'clInL') + ' .56s cubic-bezier(.5,0,.35,1)';
+    setTimeout(() => { if (clone.parentNode) clone.remove(); nw.style.animation = ''; turning = false; }, 580);
   }
-  function setMonth(m, dir) { turn(() => { viewMonth = ((m-1+12)%12)+1; manual = (viewMonth !== cm()); build(viewMonth); }, dir || 'next'); }
   function tick() { const k = new Date().toDateString(); if (k !== dayKey) { dayKey = k; if (!manual) build(cm()); } }
 
   $('prev').onclick = () => setMonth(viewMonth - 1, 'prev');
