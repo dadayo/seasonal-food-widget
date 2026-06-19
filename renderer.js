@@ -25,15 +25,21 @@
   let store = {};
   try { store = JSON.parse(localStorage.getItem('seasonal-eaten') || '{}'); } catch (e) { store = {}; }
   const saveStore = () => { try { localStorage.setItem('seasonal-eaten', JSON.stringify(store)); } catch (e) {} };
-  const recOf = (m,n) => store[m] && store[m][n];
+  const yr = () => new Date().getFullYear();
+  const keyOf = (m) => yr() + '-' + m;          // record per year-month
+  // migrate old month-only keys ("6") → "2026-6"
+  Object.keys(store).forEach(k => { if (/^\d+$/.test(k)) { const nk = yr() + '-' + k; store[nk] = Object.assign(store[nk] || {}, store[k]); delete store[k]; } });
+  saveStore();
+  const recOf = (m,n) => store[keyOf(m)] && store[keyOf(m)][n];
   const isEaten = (m,n) => !!recOf(m,n);
   function markEat(m,n){            // toggle; returns record if now eaten, else null
-    store[m] = store[m] || {};
-    if (store[m][n]) { delete store[m][n]; saveStore(); return null; }
+    const k = keyOf(m); store[k] = store[k] || {};
+    if (store[k][n]) { delete store[k][n]; saveStore(); return null; }
     const dt = new Date();
     const rec = { d: (dt.getMonth()+1) + '.' + dt.getDate(), s: STAMPS[Math.floor(Math.random()*STAMPS.length)] };
-    store[m][n] = rec; saveStore(); return rec;
+    store[k][n] = rec; saveStore(); return rec;
   }
+  function yearTotal(){ let t = 0; const p = yr() + '-'; Object.keys(store).forEach(k => { if (k.indexOf(p) === 0) t += Object.keys(store[k]).length; }); return t; }
 
   let pool = [], viewMonth = cm(), manual = false, dayKey = '';
   let parts = [], stageW = 0, stageH = 0, fx0 = 0, fx1 = 0, fy0 = 0, fy1 = 0;
@@ -46,6 +52,7 @@
     $('card').style.setProperty('--accent', COLOR[m-1]);
     $('card').style.setProperty('--g1', GLOW[m-1][0]);
     $('card').style.setProperty('--g2', GLOW[m-1][1]);
+    $('card').dataset.season = ['winter','winter','spring','spring','spring','summer','summer','summer','autumn','autumn','autumn','winter'][m-1];
     $('mon').textContent = m + '월';
     const d = new Date();
     $('date').textContent = (m === cm()) ? (d.getDate() + '일 ' + WEEK[d.getDay()]) : '';
@@ -225,13 +232,14 @@
 
   // 먹은 일기 패널
   function openDiary() {
-    const data = store[viewMonth] || {}, byDate = {};
+    const data = store[keyOf(viewMonth)] || {}, byDate = {};
     Object.keys(data).forEach(n => { const d = (data[n] && data[n].d) || '?'; (byDate[d] = byDate[d] || []).push(n); });
     const days = Object.keys(byDate).sort((a,b) => {
       const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
       return (pb[0]-pa[0]) || (pb[1]-pa[1]);
     });
-    $('dtitle').textContent = viewMonth + '월 먹은 일기';
+    $('dtitle').innerHTML = yr() + '년 ' + viewMonth + '월 먹은 일기'
+      + ' <span style="font-size:10px;color:var(--muted);font-weight:700;margin-left:4px;">올해 ' + yearTotal() + '가지</span>';
     if (!days.length) {
       $('dlist').innerHTML = '<div class="dempty">아직 기록이 없어요.<br>음식을 톡 클릭해서 모아보세요 😋</div>';
     } else {
