@@ -31,7 +31,7 @@
 
   let pool = [], viewMonth = cm(), manual = false, dayKey = '';
   let parts = [], stageW = 0, stageH = 0, fx0 = 0, fx1 = 0, fy0 = 0, fy1 = 0;
-  let raf = null, selected = null, drag = null, shownIt = null;
+  let raf = null, labelP = null, drag = null, shownIt = null;
 
   function eatenCount(){ return pool.filter(it => isEaten(viewMonth, it.name)).length; }
   function updateProg(){ $('pnum').textContent = eatenCount(); $('pof').textContent = '/' + pool.length; }
@@ -44,21 +44,20 @@
     $('todayBtn').style.display = (m === cm()) ? 'none' : 'inline-block';
   }
 
-  function showName(it) {
-    shownIt = it;
-    $('namebig').textContent = it.name; $('namebig').classList.add('active');
-    const r = RECIPES[it.name], rec = recOf(viewMonth, it.name);
+  // overlay label that floats above the pointed/selected food
+  function refreshLabel() {
+    const t = labelP;
+    if (!t) { $('flabel').hidden = true; shownIt = null; return; }
+    shownIt = t.it;
+    $('flname').textContent = t.it.name;
+    const r = RECIPES[t.it.name], rec = recOf(viewMonth, t.it.name);
     let html = r ? (r.join(' · ') + ' <span class="go-r">레시피 →</span>') : '<span class="go-r">레시피 검색 →</span>';
     if (rec && rec.d) html = '<span class="eaten-d">' + rec.d + ' 먹음</span> · ' + html;
-    $('namerec').innerHTML = html;
+    $('flrec').innerHTML = html;
+    $('flabel').hidden = false;
   }
-  function revertName() {
-    if (selected) { showName(selected.it); return; }
-    shownIt = null;
-    $('namebig').textContent = ''; $('namebig').classList.remove('active'); $('namerec').textContent = '';
-  }
-  function deselect(){ selected = null; parts.forEach(p => p.el.classList.remove('sel')); revertName(); }
-  function select(p){ selected = p; parts.forEach(q => q.el.classList.toggle('sel', q === p)); showName(p.it); }
+  function setLabel(p){ labelP = p; parts.forEach(q => q.el.classList.toggle('sel', q === p)); refreshLabel(); }
+  function clearLabel(){ labelP = null; parts.forEach(p => p.el.classList.remove('sel')); refreshLabel(); }
 
   function burst(p) {
     const box = $('collage'), k = 9 + Math.floor(Math.random()*6);
@@ -79,9 +78,9 @@
     const rec = markEat(viewMonth, p.it.name);
     p.eaten = !!rec; p.el.classList.toggle('eaten', p.eaten);
     if (rec) { p.el.classList.add('pop'); setTimeout(() => p.el.classList.remove('pop'), 460); burst(p); }
-    select(p); updateProg();
+    setLabel(p); updateProg();
   }
-  $('namerec').onclick = () => { if (shownIt && window.api) window.api.openRecipe(shownIt.name); };
+  $('flrec').onclick = () => { if (shownIt && window.api) window.api.openRecipe(shownIt.name); };
 
   function stageRect(){ return $('collage').getBoundingClientRect(); }
 
@@ -97,8 +96,7 @@
       drag = { p, offx:(e.clientX-r.left)-p.x, offy:(e.clientY-r.top)-p.y, vx:0, vy:0, sx:e.clientX, sy:e.clientY, moved:false };
       p.grabbed = true; w.style.cursor = 'grabbing';
     });
-    w.addEventListener('pointerenter', () => { const p = parts.find(q => q.el === w); if (p) showName(p.it); });
-    w.addEventListener('pointerleave', () => revertName());
+    w.addEventListener('pointerenter', () => { const p = parts.find(q => q.el === w); if (p) setLabel(p); });
     return { w, im };
   }
 
@@ -124,7 +122,7 @@
     pool = [];
     for (const c of ['produce','seafood','fruit']) data[c].forEach(([name,emoji]) => pool.push({ cat:c, name, emoji }));
     pool = pool.filter(it => SLUG[it.name]);
-    selected = null; revertName();
+    clearLabel();
     header(m); updateProg();
 
     const size = PSIZE[$('card').dataset.size] || PSIZE.m;
@@ -154,6 +152,11 @@
     for (const p of parts) {
       p.el.style.transform = 'translate(' + (p.x - p.size/2) + 'px,' + (p.y - p.size/2) + 'px)';
       p.img.style.transform = 'rotate(' + p.rot + 'deg)';
+    }
+    if (labelP) {
+      const fl = $('flabel');
+      fl.style.left = labelP.x + 'px';
+      fl.style.top = (labelP.y - labelP.size/2 - 6) + 'px';
     }
   }
 
@@ -237,7 +240,7 @@
   $('prev').onclick = () => setMonth(viewMonth - 1, 'prev');
   $('next').onclick = () => setMonth(viewMonth + 1, 'next');
   $('todayBtn').onclick = () => { const t = cm(); setMonth(t, (((t - viewMonth) % 12 + 12) % 12) <= 6 ? 'next' : 'prev'); };
-  document.querySelector('.stage').addEventListener('pointerdown', (e) => { if (!e.target.closest('.pim')) deselect(); });
+  document.querySelector('.stage').addEventListener('pointerdown', (e) => { if (!e.target.closest('.pim') && !e.target.closest('.flabel')) clearLabel(); });
 
   if (window.api) {
     window.api.getSize().then(s => { if (s) { $('card').dataset.size = s; build(viewMonth); } }).catch(()=>{});
