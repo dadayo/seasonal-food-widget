@@ -49,20 +49,19 @@
   .collage .pim:hover .pim-img{filter:drop-shadow(0 7px 12px #00000042);}
   .collage .pim.sel .pim-img{filter:drop-shadow(0 0 0 3px var(--accent)) drop-shadow(0 5px 9px #00000033);}
   /* eaten = sparkly warm glow behind the food (no box) */
-  .collage .paper{position:absolute;left:50%;top:50%;width:152%;height:152%;z-index:0;display:none;border-radius:50%;
+  .collage .paper{position:absolute;left:50%;top:50%;width:156%;height:156%;z-index:0;display:none;
     transform:translate(-50%,-50%);
-    background:radial-gradient(closest-side,
-      #ffffffe0 0%,
-      color-mix(in srgb,var(--accent) 60%, #fff) 20%,
-      color-mix(in srgb,var(--accent) 34%, transparent) 50%, transparent 75%);
+    background:linear-gradient(125deg, var(--g1,#9ED9C0) 0%, var(--g2,#EDE89A) 100%);
+    -webkit-mask:radial-gradient(closest-side,#000 30%,#000a 54%,transparent 76%);
+            mask:radial-gradient(closest-side,#000 30%,#000a 54%,transparent 76%);
     animation:glowpulse 2.6s ease-in-out infinite;}
   .collage .pim.eaten .paper{display:block;}
   .collage .pim.eaten .pim-img{filter:drop-shadow(0 3px 6px #0000002a) saturate(1.08) brightness(1.02);}
   @keyframes glowpulse{0%,100%{opacity:.82}50%{opacity:1}}
-  .collage .pim.eaten .paper::before,.collage .pim.eaten .paper::after{content:"✨";position:absolute;font-size:11px;opacity:0;
-    pointer-events:none;animation:twk 2.3s ease-in-out infinite;}
-  .collage .pim.eaten .paper::before{top:0;right:8%;animation-delay:.2s;}
-  .collage .pim.eaten .paper::after{bottom:6%;left:2%;font-size:9px;animation-delay:1.25s;}
+  .collage .pim.eaten::before,.collage .pim.eaten::after{content:"✨";position:absolute;font-size:12px;opacity:0;
+    pointer-events:none;z-index:2;animation:twk 2.3s ease-in-out infinite;}
+  .collage .pim.eaten::before{top:-6px;right:-4px;animation-delay:.2s;}
+  .collage .pim.eaten::after{bottom:-2px;left:-6px;font-size:9px;animation-delay:1.25s;}
   @keyframes twk{0%,100%{opacity:0;transform:scale(.3) rotate(-10deg)}50%{opacity:.95;transform:scale(1) rotate(12deg)}}
   .collage .pim.pop .paper{animation:paperIn .55s ease, glowpulse 2.6s ease-in-out .55s infinite;}
   @keyframes paperIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}
@@ -100,8 +99,10 @@
   [data-size="s"] .ttl{font-size:18px;} [data-size="s"] .namebig{font-size:13px;}
   [data-size="l"] .ttl{font-size:24px;} [data-size="l"] .pnum{font-size:50px;} [data-size="l"] .pof{font-size:21px;}
   [data-size="l"] .namebig{font-size:17px;}
-  /* small/medium = clean: no bottom bar at all (info shows as overlay on the food) */
+  /* small/medium = overlay-on-food (no bottom bar). large = name in bottom (no overlay). */
   [data-size="s"] .lower, [data-size="m"] .lower{display:none;}
+  [data-size="l"] .flabel{display:none !important;}
+  [data-size="s"] .namebox, [data-size="m"] .namebox{display:none;}
 
   /* 먹은 일기 패널 */
   .diary{position:absolute;inset:8px;z-index:40;background:var(--paper);border-radius:11px;-webkit-app-region:no-drag;
@@ -135,6 +136,10 @@
       </div>
       <div class="lower">
         <div class="prog" id="prog"><span><b class="pnum" id="pnum">0</b><span class="pof" id="pof">/0</span></span><small>맛본 제철 ›</small></div>
+        <div class="namebox">
+          <span class="namebig" id="namebig"></span>
+          <small class="namerec" id="namerec"></small>
+        </div>
       </div>
       <div class="diary" id="diary" hidden>
         <div class="dhead"><span id="dtitle">먹은 일기</span><button id="dclose">✕</button></div>

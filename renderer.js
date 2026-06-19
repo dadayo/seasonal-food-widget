@@ -4,6 +4,12 @@
   // per-month point color — seasonal wheel (winter blue → spring pink/green → summer teal/coral → autumn amber)
   const COLOR = ['#5C7FB0','#6E9BA8','#E58AAE','#7FB97E','#4FA86A','#2FA7A0',
                  '#F2774E','#E8576A','#E0962F','#DC7029','#B6603C','#4E78AE'];
+  // eaten glow: bright analogous diagonal pair per month (e.g. green→yellow)
+  const GLOW = [
+    ['#A9C7F0','#CFE3F2'], ['#A6DAD2','#D6EFC9'], ['#F7BCD3','#FBD9C6'], ['#BFE3A0','#EEF0A0'],
+    ['#A6E0A0','#E2EF9C'], ['#8FD9C2','#ECE89A'], ['#FBC2A0','#FBE6A0'], ['#FBB2BC','#FBD9A8'],
+    ['#F4D49A','#F7EBA6'], ['#F6C495','#F7E2A0'], ['#EBBE9C','#F3E0A8'], ['#AEC8EE','#D6E6F2']
+  ];
   const PSIZE = { s:50, m:66, l:82 };
   const SMALL_CAP = 10;
   const MAXV = 5, MINV = 0.14, DAMP = 0.99;     // languid drift
@@ -38,6 +44,8 @@
 
   function header(m) {
     $('card').style.setProperty('--accent', COLOR[m-1]);
+    $('card').style.setProperty('--g1', GLOW[m-1][0]);
+    $('card').style.setProperty('--g2', GLOW[m-1][1]);
     $('mon').textContent = m + '월';
     const d = new Date();
     $('date').textContent = (m === cm()) ? (d.getDate() + '일 ' + WEEK[d.getDay()]) : '';
@@ -47,14 +55,17 @@
   // overlay label that floats above the pointed/selected food
   function refreshLabel() {
     const t = labelP;
-    if (!t) { $('flabel').hidden = true; shownIt = null; return; }
+    if (!t) {
+      $('flabel').hidden = true; shownIt = null;
+      $('namebig').textContent = ''; $('namebig').classList.remove('active'); $('namerec').textContent = '';
+      return;
+    }
     shownIt = t.it;
-    $('flname').textContent = t.it.name;
     const r = RECIPES[t.it.name], rec = recOf(viewMonth, t.it.name);
     let html = r ? (r.join(' · ') + ' <span class="go-r">레시피 →</span>') : '<span class="go-r">레시피 검색 →</span>';
     if (rec && rec.d) html = '<span class="eaten-d">' + rec.d + ' 먹음</span> · ' + html;
-    $('flrec').innerHTML = html;
-    $('flabel').hidden = false;
+    $('flname').textContent = t.it.name; $('flrec').innerHTML = html; $('flabel').hidden = false;   // overlay (s/m)
+    $('namebig').textContent = t.it.name; $('namebig').classList.add('active'); $('namerec').innerHTML = html; // bottom (l)
   }
   function setLabel(p){ labelP = p; parts.forEach(q => q.el.classList.toggle('sel', q === p)); refreshLabel(); }
   function clearLabel(){ labelP = null; parts.forEach(p => p.el.classList.remove('sel')); refreshLabel(); }
@@ -81,6 +92,7 @@
     setLabel(p); updateProg();
   }
   $('flrec').onclick = () => { if (shownIt && window.api) window.api.openRecipe(shownIt.name); };
+  $('namerec').onclick = () => { if (shownIt && window.api) window.api.openRecipe(shownIt.name); };
 
   function stageRect(){ return $('collage').getBoundingClientRect(); }
 
