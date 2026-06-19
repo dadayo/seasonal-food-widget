@@ -75,10 +75,14 @@
   .namerec .eaten-d{color:var(--accent);font-weight:800;}
 
   /* sizes */
-  [data-size="s"] .ttl{font-size:18px;} [data-size="s"] .pnum{font-size:30px;} [data-size="s"] .pof{font-size:13px;}
-  [data-size="s"] .namebig{font-size:13px;}
+  [data-size="s"] .ttl{font-size:18px;} [data-size="s"] .namebig{font-size:13px;}
   [data-size="l"] .ttl{font-size:24px;} [data-size="l"] .pnum{font-size:50px;} [data-size="l"] .pof{font-size:21px;}
   [data-size="l"] .namebig{font-size:17px;}
+  /* small/medium = clean: hide progress, center the selected name/recipe */
+  [data-size="s"] .prog, [data-size="m"] .prog{display:none;}
+  [data-size="s"] .lower, [data-size="m"] .lower{justify-content:center;min-height:30px;}
+  [data-size="s"] .namebox, [data-size="m"] .namebox{text-align:center;align-self:center;max-width:94%;}
+  [data-size="m"] .namebig{font-size:16px;}
 
   /* 먹은 일기 패널 */
   .diary{position:absolute;inset:8px;z-index:40;background:var(--paper);border-radius:11px;-webkit-app-region:no-drag;

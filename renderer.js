@@ -131,7 +131,8 @@
     const box = $('collage'); box.innerHTML = '';
     const rect = box.getBoundingClientRect(); stageW = rect.width || 280; stageH = rect.height || 160;
     const mx = stageW * 0.35, my = stageH * 0.35; fx0 = -mx; fx1 = stageW + mx; fy0 = -my; fy1 = stageH + my;
-    const n = ($('card').dataset.size === 's') ? Math.min(pool.length, SMALL_CAP) : pool.length;
+    const cap = ({ s:6, m:11 })[$('card').dataset.size] || pool.length;   // medium: calmer, large: all
+    const n = Math.min(cap, pool.length);
     let chosen;
     if (n >= pool.length) chosen = pool.slice();
     else { chosen = []; const gap = pool.length / n; for (let k = 0; k < n; k++) chosen.push(pool[Math.floor(k*gap) % pool.length]); }
