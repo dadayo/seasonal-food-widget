@@ -48,28 +48,35 @@
   .collage .pim-img{position:relative;z-index:1;display:block;filter:drop-shadow(0 3px 5px #0000001f);transition:opacity .35s ease,filter .15s ease;}
   .collage .pim:hover .pim-img{filter:drop-shadow(0 7px 12px #00000042);}
   .collage .pim.sel .pim-img{filter:drop-shadow(0 0 0 3px var(--accent)) drop-shadow(0 5px 9px #00000033);}
-  /* eaten = soft warm glow behind the food (no box) */
-  .collage .paper{position:absolute;left:50%;top:50%;width:150%;height:150%;z-index:0;display:none;border-radius:50%;
+  /* eaten = sparkly warm glow behind the food (no box) */
+  .collage .paper{position:absolute;left:50%;top:50%;width:152%;height:152%;z-index:0;display:none;border-radius:50%;
     transform:translate(-50%,-50%);
     background:radial-gradient(closest-side,
-      color-mix(in srgb,var(--accent) 55%, #fff) 0%,
-      color-mix(in srgb,var(--accent) 30%, transparent) 48%, transparent 74%);}
+      #ffffffe0 0%,
+      color-mix(in srgb,var(--accent) 60%, #fff) 20%,
+      color-mix(in srgb,var(--accent) 34%, transparent) 50%, transparent 75%);
+    animation:glowpulse 2.6s ease-in-out infinite;}
   .collage .pim.eaten .paper{display:block;}
-  .collage .pim.eaten .pim-img{filter:drop-shadow(0 3px 6px #0000002a) saturate(1.06);}
-  .collage .pim.pop .paper{animation:paperIn .55s ease;}
+  .collage .pim.eaten .pim-img{filter:drop-shadow(0 3px 6px #0000002a) saturate(1.08) brightness(1.02);}
+  @keyframes glowpulse{0%,100%{opacity:.82}50%{opacity:1}}
+  .collage .pim.eaten .paper::before,.collage .pim.eaten .paper::after{content:"✨";position:absolute;font-size:11px;opacity:0;
+    pointer-events:none;animation:twk 2.3s ease-in-out infinite;}
+  .collage .pim.eaten .paper::before{top:0;right:8%;animation-delay:.2s;}
+  .collage .pim.eaten .paper::after{bottom:6%;left:2%;font-size:9px;animation-delay:1.25s;}
+  @keyframes twk{0%,100%{opacity:0;transform:scale(.3) rotate(-10deg)}50%{opacity:.95;transform:scale(1) rotate(12deg)}}
+  .collage .pim.pop .paper{animation:paperIn .55s ease, glowpulse 2.6s ease-in-out .55s infinite;}
   @keyframes paperIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}
-    60%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+    60%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
   .collage .pop-emoji{position:absolute;font-size:28px;pointer-events:none;transform:translate(-50%,-50%);
     animation:burst 1.1s ease forwards;z-index:8;}
-  /* floating overlay label (name + recipe) above the pointed/selected food */
-  .flabel{position:absolute;z-index:12;transform:translate(-50%,-100%);background:#fffffff5;border-radius:9px;
-    padding:4px 10px;box-shadow:0 4px 12px #00000026;text-align:center;white-space:nowrap;-webkit-app-region:no-drag;
-    transition:opacity .12s;}
+  /* overlay label — just text above the food (no box) */
+  .flabel{position:absolute;z-index:12;transform:translate(-50%,-100%);text-align:center;white-space:nowrap;
+    -webkit-app-region:no-drag;padding-bottom:5px;}
   .flabel[hidden]{display:none;}
-  .flabel::after{content:"";position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);
-    border:5px solid transparent;border-top-color:#fffffff5;}
-  #flname{font-weight:800;font-size:14px;color:var(--ink);letter-spacing:-.3px;}
-  #flrec{display:block;font-size:10px;color:#5d564c;font-weight:600;margin-top:1px;}
+  #flname{font-weight:800;font-size:14px;color:var(--ink);letter-spacing:-.3px;
+    text-shadow:0 1px 2px #fff,0 0 5px #ffffffcc,0 0 9px #ffffffaa;}
+  #flrec{display:block;font-size:10px;color:#4a443c;font-weight:700;margin-top:1px;
+    text-shadow:0 1px 2px #fff,0 0 5px #ffffffcc;}
   #flrec .go-r{color:var(--accent);font-weight:800;cursor:pointer;}
   #flrec .eaten-d{color:var(--accent);font-weight:800;}
   @keyframes burst{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}
