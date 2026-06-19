@@ -78,7 +78,7 @@
   function eatToggle(p) {
     const rec = markEat(viewMonth, p.it.name);
     p.eaten = !!rec; p.el.classList.toggle('eaten', p.eaten);
-    if (rec) { p.stamp.textContent = rec.s; p.el.classList.add('pop'); setTimeout(() => p.el.classList.remove('pop'), 460); burst(p); }
+    if (rec) { p.el.classList.add('pop'); setTimeout(() => p.el.classList.remove('pop'), 460); burst(p); }
     select(p); updateProg();
   }
   $('namerec').onclick = () => { if (shownIt && window.api) window.api.openRecipe(shownIt.name); };
@@ -88,8 +88,8 @@
   function makePim(it, size) {
     const w = document.createElement('div'); w.className = 'pim'; w.title = it.name;
     const im = document.createElement('img'); im.className = 'pim-img'; im.src = 'assets/' + SLUG[it.name] + '.png'; im.style.width = size + 'px';
-    const st = document.createElement('span'); st.className = 'stamp'; st.textContent = '맛봄';
-    w.appendChild(im); w.appendChild(st);
+    const paper = document.createElement('div'); paper.className = 'paper';
+    w.appendChild(paper); w.appendChild(im);
     w.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       const p = parts.find(q => q.el === w); if (!p) return;
@@ -99,7 +99,7 @@
     });
     w.addEventListener('pointerenter', () => { const p = parts.find(q => q.el === w); if (p) showName(p.it); });
     w.addEventListener('pointerleave', () => revertName());
-    return { w, im, st };
+    return { w, im };
   }
 
   document.addEventListener('pointermove', (e) => {
@@ -139,11 +139,10 @@
     drag = null;
     parts = chosen.map((it) => {
       const mk = makePim(it, size); box.appendChild(mk.w);
-      const rec = recOf(m, it.name), eaten = !!rec;
+      const eaten = isEaten(m, it.name);
       if (eaten) mk.w.classList.add('eaten');
-      mk.st.textContent = (rec && rec.s) || '맛봄';
       const r = size * 0.44, ang = rnd(0, Math.PI*2), sp = rnd(0.12, 0.26);
-      return { el:mk.w, img:mk.im, stamp:mk.st, size, it, r, eaten, x: rnd(fx0+r, fx1-r), y: rnd(fy0+r, fy1-r),
+      return { el:mk.w, img:mk.im, size, it, r, eaten, x: rnd(fx0+r, fx1-r), y: rnd(fy0+r, fy1-r),
         vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, rot: rnd(-6,6), vr: rnd(-0.07,0.07), grabbed:false };
     });
     render();
@@ -217,9 +216,18 @@
       return (pb[0]-pa[0]) || (pb[1]-pa[1]);
     });
     $('dtitle').textContent = viewMonth + '월 먹은 일기';
-    $('dlist').innerHTML = days.length
-      ? days.map(d => '<div class="dday"><b>' + d + '</b><span>' + byDate[d].join(' · ') + '</span></div>').join('')
-      : '<div class="dempty">아직 기록이 없어요.<br>음식을 톡 클릭해서 도장을 찍어보세요 😋</div>';
+    if (!days.length) {
+      $('dlist').innerHTML = '<div class="dempty">아직 기록이 없어요.<br>음식을 톡 클릭해서 모아보세요 😋</div>';
+    } else {
+      $('dlist').innerHTML = days.map(d => {
+        const cards = byDate[d].map((n, i) => {
+          const slug = SLUG[n], rot = ((i % 2 ? 1 : -1) * (2 + (i % 3) * 2));
+          return '<div class="scard" title="' + n + '" style="transform:rotate(' + rot + 'deg)">'
+            + (slug ? '<img src="assets/' + slug + '.png" alt="">' : n) + '</div>';
+        }).join('');
+        return '<div class="dgroup"><div class="ddate">' + d + '</div><div class="dstamps">' + cards + '</div></div>';
+      }).join('');
+    }
     $('diary').hidden = false;
   }
   $('prog').onclick = openDiary;
