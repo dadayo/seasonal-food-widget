@@ -262,12 +262,25 @@
   $('todayBtn').onclick = () => { const t = cm(); setMonth(t, (((t - viewMonth) % 12 + 12) % 12) <= 6 ? 'next' : 'prev'); };
   document.querySelector('.stage').addEventListener('pointerdown', (e) => { if (!e.target.closest('.pim') && !e.target.closest('.flabel')) clearLabel(); });
 
+  // small/medium: frame fills the whole window (tiny margin). large: keep margin + soft shadow.
+  function applyWrap(s) {
+    const w = document.querySelector('.shadowwrap');
+    if (s === 'l') {
+      w.style.margin = '42px'; w.style.height = 'calc(100vh - 84px)';
+      w.style.filter = 'drop-shadow(0 2px 5px #00000012) drop-shadow(0 9px 16px #0000001c) drop-shadow(0 15px 24px #00000012)';
+    } else {
+      w.style.margin = '6px'; w.style.height = 'calc(100vh - 12px)';
+      w.style.filter = 'drop-shadow(0 2px 6px #0000001c)';
+    }
+  }
+
   if (window.api) {
-    window.api.getSize().then(s => { if (s) { $('card').dataset.size = s; build(viewMonth); } }).catch(()=>{});
-    window.api.onSize(s => { $('card').dataset.size = s; build(viewMonth); });
+    window.api.getSize().then(s => { if (s) { $('card').dataset.size = s; applyWrap(s); build(viewMonth); } }).catch(()=>{});
+    window.api.onSize(s => { $('card').dataset.size = s; applyWrap(s); build(viewMonth); });
   }
 
   dayKey = new Date().toDateString();
+  applyWrap($('card').dataset.size);
   build(viewMonth);
   setInterval(tick, 60*1000);
 })();
