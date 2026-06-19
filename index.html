@@ -48,13 +48,17 @@
   .collage .pim-img{position:relative;z-index:1;display:block;filter:drop-shadow(0 3px 5px #0000001f);transition:opacity .35s ease,filter .15s ease;}
   .collage .pim:hover .pim-img{filter:drop-shadow(0 7px 12px #00000042);}
   .collage .pim.sel .pim-img{filter:drop-shadow(0 0 0 3px var(--accent)) drop-shadow(0 5px 9px #00000033);}
-  /* eaten = food stuck on a little stamp paper (perforation-ish dashed edge) */
-  .collage .paper{position:absolute;left:50%;top:50%;width:122%;height:122%;z-index:0;display:none;
-    transform:translate(-50%,-50%) rotate(-7deg);background:#fffffff2;border-radius:6px;
-    border:1.6px dashed color-mix(in srgb, var(--accent) 55%, #fff);box-shadow:0 2px 6px #00000026;}
+  /* eaten = soft warm glow behind the food (no box) */
+  .collage .paper{position:absolute;left:50%;top:50%;width:150%;height:150%;z-index:0;display:none;border-radius:50%;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(closest-side,
+      color-mix(in srgb,var(--accent) 55%, #fff) 0%,
+      color-mix(in srgb,var(--accent) 30%, transparent) 48%, transparent 74%);}
   .collage .pim.eaten .paper{display:block;}
-  .collage .pim.pop .paper{animation:paperIn .42s cubic-bezier(.2,1.5,.4,1);}
-  @keyframes paperIn{0%{opacity:0;transform:translate(-50%,-50%) rotate(-7deg) scale(.4)}100%{opacity:1;transform:translate(-50%,-50%) rotate(-7deg) scale(1)}}
+  .collage .pim.eaten .pim-img{filter:drop-shadow(0 3px 6px #0000002a) saturate(1.06);}
+  .collage .pim.pop .paper{animation:paperIn .55s ease;}
+  @keyframes paperIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}
+    60%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
   .collage .pop-emoji{position:absolute;font-size:28px;pointer-events:none;transform:translate(-50%,-50%);
     animation:burst 1.1s ease forwards;z-index:8;}
   /* floating overlay label (name + recipe) above the pointed/selected food */
@@ -103,8 +107,8 @@
   .dgroup{}
   .ddate{font-size:11px;font-weight:800;color:var(--accent);margin-bottom:5px;}
   .dstamps{display:flex;flex-wrap:wrap;gap:7px;}
-  .scard{width:48px;height:48px;background:#fff;border:1.6px dashed color-mix(in srgb,var(--accent) 55%,#fff);
-    border-radius:6px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px #00000022;}
+  .scard{width:48px;height:48px;background:#fff;border:1px solid #0000000f;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px #0000001f;}
   .scard img{max-width:38px;max-height:38px;object-fit:contain;}
   .dempty{font-size:11.5px;color:var(--muted);line-height:1.6;text-align:center;margin:auto;}
 </style>
